@@ -1,0 +1,30 @@
+make: Entering directory `/home/android/mydroid'
+build/core/product_config.mk:261: WARNING: adding test OTA key
+============================================
+TARGET_PRODUCT=generic
+TARGET_BUILD_VARIANT=eng
+TARGET_SIMULATOR=
+TARGET_BUILD_TYPE=release
+TARGET_ARCH=arm
+HOST_ARCH=x86
+HOST_OS=linux
+HOST_BUILD_TYPE=release
+BUILD_ID=
+============================================
+target thumb C: vpnc <= /home/android/mydroid/external/vpnc-0.5.3/config.c
+/home/android/mydroid/external/vpnc-0.5.3/config.c:31:20: error: gcrypt.h: No such file or directory
+In file included from /home/android/mydroid/external/vpnc-0.5.3/error.h:25,
+                 from /home/android/mydroid/external/vpnc-0.5.3/sysdep.h:41,
+                 from /home/android/mydroid/external/vpnc-0.5.3/config.c:33:
+bionic/libc/include/features.h:39:1: warning: "_GNU_SOURCE" redefined
+/home/android/mydroid/external/vpnc-0.5.3/config.c:21:1: warning: this is the location of the previous definition
+In file included from /home/android/mydroid/external/vpnc-0.5.3/vpnc.h:24,
+                 from /home/android/mydroid/external/vpnc-0.5.3/config.c:35:
+/home/android/mydroid/external/vpnc-0.5.3/tunip.h:43: error: expected specifier-qualifier-list before 'gcry_cipher_hd_t'
+/home/android/mydroid/external/vpnc-0.5.3/config.c: In function 'read_config_file':
+/home/android/mydroid/external/vpnc-0.5.3/config.c:493: warning: implicit declaration of function 'getline'
+/home/android/mydroid/external/vpnc-0.5.3/config.c: In function 'do_config':
+/home/android/mydroid/external/vpnc-0.5.3/config.c:786: warning: implicit declaration of function 'getpass'
+/home/android/mydroid/external/vpnc-0.5.3/config.c:786: warning: passing argument 1 of 'strdup' makes pointer from integer without a cast
+make: *** [out/target/product/generic/obj/EXECUTABLES/vpnc_intermediates/config.o] Error 1
+make: Leaving directory `/home/android/mydroid'
