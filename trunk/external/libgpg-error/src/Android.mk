@@ -56,4 +56,4 @@ err-sources.h:
 # override files target so the header files get generated	
 # files: err-sources-sym.h code-from-errno.h errnos-sym.h gpg-error.h err-codes.h code-to-errno.h err-codes-sym.h err-sources.h 
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)
