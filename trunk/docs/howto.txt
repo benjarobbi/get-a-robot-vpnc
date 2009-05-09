@@ -1,0 +1,57 @@
+This is a work in progress.  Mail me at my username (check the google project page)
+at gmail.com with any corrections.
+
+The long term goal is to get all of this in an installable package, not quite sure
+how to do that yet, probably requires all kinds of java trickery.
+
+Building from source
+--------------------
+
+Building this project from source is not too difficult if you have
+the current tree buildin.
+
+Check out the project from the google code and link the directories 
+into the main subversion repository.
+
+For example, in the external/ directory:
+
+	libgcrypt -> /home/android/get-a-robot-vpnc/external/libgcrypt/
+	libgpg-error -> /home/android/get-a-robot-vpnc/external/libgpg-error/
+	vpnc -> /home/android/get-a-robot-vpnc/external/vpnc/
+	vpnc-tools -> ../../get-a-robot-vpnc/external/vpnc-tools/
+
+Then from the root of the svn checkout, start a build.
+
+mydroid $ make
+build/core/product_config.mk:261: WARNING: adding test OTA key
+============================================
+TARGET_PRODUCT=generic
+TARGET_BUILD_VARIANT=eng
+TARGET_SIMULATOR=
+TARGET_BUILD_TYPE=release
+TARGET_ARCH=arm
+HOST_ARCH=x86
+
+<bucket of lines scroll, and build finishes>
+
+In the external/vpnc-tools/ dirctory there should be shell script
+that must be run on the system that is building the tools ( not the phone)
+This creates an tarball of the tools ready as the application would expect
+it to exist on disk.  This creates the tarball that will be used in the
+next section.
+
+
+Installing from tarball
+-----------------------
+
+The extracted tarball represents the expected ondisk layout.  One can
+upload the compressed image and extract ( At the time of writing i dont
+know if there is a console unzip/tar/extractor on the pristine image).
+
+
+
+
+
+Installing from the apk file
+----------------------------
+Not complete at this time
