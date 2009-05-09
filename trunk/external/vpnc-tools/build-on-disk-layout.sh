@@ -5,28 +5,31 @@
 
 export TOP=/home/android/mydroid/
 
+ORG="org.codeandroid.vpnc"
 FILENAME=get-a-robot-vpnc.`date '+%d-%m-%y'`
 TMPDIR=`mktemp -d`
 BUILDDIR=`pwd`
 
-mkdir -p $TMPDIR/etc/vpnc
-mkdir -p $TMPDIR/system/bin/
+ROOT="$TMPDIR/data/data/$ORG"
+BINDIR="$ROOT/bin"
+CONFDIR="$ROOT/etc/vpnc"
+
+mkdir -p $BINDIR 
+mkdir -p $CONFDIR 
 
 cp        $TOP/out/target/product/generic/system/bin/vpnc \
   	  $TOP/out/target/product/generic/system/bin/make-tun-device \
-	  $TMPDIR/system/bin
+	  $BINDIR
 
-cp 	  $TOP/external/vpnc/vpnc.conf $TMPDIR/etc/vpnc
-cp 	  $TOP/external/vpnc-tools/vpnc-script $TMPDIR/etc/vpnc
+cp 	  $TOP/external/vpnc/vpnc.conf \
+	  $TOP/external/vpnc-tools/vpnc-script \
+	  $CONFDIR 
 
-# ifconfig/route are from busybox.. if somone can build iproute2 i'll be happy
-cp 	  $TOP/external/vpnc-tools/bb $TMPDIR/system/bin/
-ln -s	  $TOP/external/vpnc-tools/bb $TMPDIR/system/bin/ifconfig
-ln -s 	  $TOP/external/vpnc-tools/bb $TMPDIR/system/bin/route 
+cp 	  $TOP/external/vpnc-tools/bb $BINDIR
+ln -s	  $BINDIR/bb $BINDIR/ifconfig
+ln -s 	  $BINDIR/bb $BINDIR/route 
 
 sync 
 cd $TMPDIR
 tar  -jcvf "$BUILDDIR/$FILENAME.tar.bz2" .
-
-
 
