@@ -5,7 +5,7 @@ import android.view.View.OnClickListener;
 import android.view.View;
 import android.util.Log; 
 
-class VPNConnectionManager implements OnClickListener {
+public class VPNConnectionManager implements OnClickListener {
 	
 	private String APPNAME = "VPNC CONNECTION MANAGER"; 
 

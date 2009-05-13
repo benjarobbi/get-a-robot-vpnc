@@ -64,9 +64,14 @@ public class VPNC extends Activity implements OnClickListener
 		ConnectButton = (Button) findViewById(R.id.Connect);
 		ConnectButton.setOnClickListener(ConnectionManager); 
 
+		/* Open the JSON file, lets get a list of networks */ 
+		String NetworkList[] = LoadJSONSetting();
+
 		ArrayAdapter spinnerArrayAdapter = new ArrayAdapter(this,
         		android.R.layout.simple_spinner_item,
-            	new String[] { "Network 1", "Network 2", "Dog" });
+			NetworkList 
+			
+            	);
 
 		NetworkChoice.setAdapter(spinnerArrayAdapter);
 
@@ -84,6 +89,12 @@ public class VPNC extends Activity implements OnClickListener
 
 	}
 
+	/* FIXME: do something here */ 
+	private String[] LoadJSONSetting() {
+            	return new String[] { "Network 1", "Network 2", "Dog" };
+	}
+
+
 	/* We grab the settings that the user has changed/made */
 	private void getCurrentToJSON() {
 		/* default path is /data/data/org.codeandroid.something */
@@ -95,7 +106,6 @@ public class VPNC extends Activity implements OnClickListener
 			FileOutputStream out; // declare a file output object
 			PrintStream p; // declare a print stream object
 
-			/* FIXME:  There has to be a better way, pathbuilder or something */
 			Log.i(APPNAME, "Attempting to write to " + SettingsFile ); 
 			out = new FileOutputStream(SettingsFile);
 			p = new PrintStream( out );
