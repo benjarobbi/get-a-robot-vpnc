@@ -9,10 +9,9 @@ import android.view.View;
 import android.graphics.Color;
 import android.view.View.OnClickListener;
 
-/* For writing settings to disk */
-import java.io.FileOutputStream; 
-import java.io.PrintStream; 
-import org.json.JSONObject; 
+/* For reading/writing settings to disk */
+import java.io.*;
+import org.json.JSONObject;
 
 /* For managing and setting up the connection */
 import org.codeandroid.vpnc_frontend.VPNConnectionManager;
@@ -36,6 +35,9 @@ public class VPNC extends Activity implements OnClickListener
 
 	/* Not sure what you call this */
 	VPNConnectionManager ConnectionManager = new VPNConnectionManager(); 
+	
+	/* Configuration State */
+	JSONObject ConfigurationSettings;
 
     	/** Called when the activity is first created. */
 	@Override
@@ -89,11 +91,37 @@ public class VPNC extends Activity implements OnClickListener
 
 	}
 
-	/* FIXME: do something here */ 
+	/* FIXME: return network list from loaded json here.  */ 
 	private String[] LoadJSONSetting() {
             	return new String[] { "Network 1", "Network 2", "Dog" };
 	}
 
+	/* FIXME: Actually load JSON from disk */ 
+	private void LoadJSONSettings() {
+
+		try {		
+
+			BufferedReader in = new BufferedReader(new FileReader(SettingsFile));
+			String str = "";
+
+			/* Read entire file in */ 
+			while ((str += in.readLine()+'\n') != null) {
+				;
+			}
+			in.close();
+
+			ConfigurationSettings = new JSONObject(str); // WORKING  
+
+		} catch (Exception e) {
+
+			/* Just load blank settings */ 
+			Log.i(APPNAME, "Problem with loading json");
+			ConfigurationSettings = new JSONObject();
+
+		}
+
+
+	}
 
 	/* We grab the settings that the user has changed/made */
 	private void getCurrentToJSON() {
@@ -101,7 +129,6 @@ public class VPNC extends Activity implements OnClickListener
 	
 		Log.i(APPNAME, "Writing settings to JSON"); 
 		try {		
-
 
 			FileOutputStream out; // declare a file output object
 			PrintStream p; // declare a print stream object
