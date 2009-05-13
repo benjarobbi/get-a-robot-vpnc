@@ -23,6 +23,7 @@ public class VPNC extends Activity implements OnClickListener
 
 	private String APPNAME = "VPNC";  
 	private String DATADIR = "/data/data/org.codeandroid.vpnc_frontend/"; 
+	String SettingsFile = DATADIR.concat("/conf/networks.json"); 
 
 	/* UI Elements*/
 	Spinner NetworkChoice;
@@ -95,7 +96,6 @@ public class VPNC extends Activity implements OnClickListener
 			PrintStream p; // declare a print stream object
 
 			/* FIXME:  There has to be a better way, pathbuilder or something */
-			String SettingsFile = DATADIR.concat("/conf/something.json"); 
 			Log.i(APPNAME, "Attempting to write to " + SettingsFile ); 
 			out = new FileOutputStream(SettingsFile);
 			p = new PrintStream( out );
