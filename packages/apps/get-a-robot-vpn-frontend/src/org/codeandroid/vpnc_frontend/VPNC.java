@@ -8,10 +8,17 @@ import android.util.Log;
 import android.view.View;
 import android.graphics.Color;
 import android.view.View.OnClickListener;
+import android.content.Context;
 
 /* For reading/writing settings to disk */
-import java.io.*;
-import org.json.JSONObject;
+import org.json.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 
 /* For managing and setting up the connection */
 import org.codeandroid.vpnc_frontend.VPNConnectionManager;
@@ -22,7 +29,7 @@ public class VPNC extends Activity implements OnClickListener
 
 	private String APPNAME = "VPNC";  
 	private String DATADIR = "/data/data/org.codeandroid.vpnc_frontend/"; 
-	String SettingsFile = DATADIR.concat("/conf/networks.json"); 
+	public static final String SETTINGS_FILE = "networks.json";
 
 	/* UI Elements*/
 	Spinner NetworkChoice;
@@ -43,9 +50,13 @@ public class VPNC extends Activity implements OnClickListener
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-    	
+
+    		/* Not sure if we should do this first or last, or where */ 
+		LoadJSONSettings();
+
 		NetworkChoice = (Spinner) findViewById(R.id.network_chooser); 
 
 		IPSEC_Gateway = (EditText) findViewById(R.id.IPSEC_Gateway); 
@@ -67,7 +78,7 @@ public class VPNC extends Activity implements OnClickListener
 		ConnectButton.setOnClickListener(ConnectionManager); 
 
 		/* Open the JSON file, lets get a list of networks */ 
-		String NetworkList[] = LoadJSONSetting();
+		String NetworkList[] = NetworkList();
 
 		ArrayAdapter spinnerArrayAdapter = new ArrayAdapter(this,
         		android.R.layout.simple_spinner_item,
@@ -87,71 +98,86 @@ public class VPNC extends Activity implements OnClickListener
 		tmp.setTextColor(Color.BLACK);
 		tmp.selectAll(); 
 
-		getCurrentToJSON(); 
+		Log.i(APPNAME ,"Current JSON data is " + getCurrentToJSON() );
 
 	}
 
 	/* FIXME: return network list from loaded json here.  */ 
-	private String[] LoadJSONSetting() {
-            	return new String[] { "Network 1", "Network 2", "Dog" };
+	private String[] NetworkList() {
+
+				/*
+				return ConfigurationSettings.get("networks");
+				*/
+ 				return new String[] { "Network 1", "Network 2", "Create New Network" };
+		
 	}
 
 	/* FIXME: Actually load JSON from disk */ 
 	private void LoadJSONSettings() {
 
-		try {		
+		FileInputStream fin = null; 
+		InputStreamReader irdr = null;
 
-			BufferedReader in = new BufferedReader(new FileReader(SettingsFile));
-			String str = "";
+		try {			
 
-			/* Read entire file in */ 
-			while ((str += in.readLine()+'\n') != null) {
-				;
+			fin = openFileInput(SETTINGS_FILE);
+
+			irdr = new InputStreamReader(fin); // promote
+
+			int size = (int) fin.getChannel().size();
+			char[] data = new char[size]; // allocate char array of right
+
+			// size
+			irdr.read(data, 0, size); // read into char array
+			irdr.close();
+
+			String contents = new String(data);
+			ConfigurationSettings = new JSONObject(contents); // WORKING  
+			
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (irdr != null) {
+					irdr.close();
+				}
+				if (fin != null) {
+					fin.close();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			in.close();
-
-			ConfigurationSettings = new JSONObject(str); // WORKING  
-
-		} catch (Exception e) {
-
-			/* Just load blank settings */ 
-			Log.i(APPNAME, "Problem with loading json");
-			ConfigurationSettings = new JSONObject();
-
 		}
 
-
+		Log.i(APPNAME, "Done loading settings"); 
 	}
 
 	/* We grab the settings that the user has changed/made */
-	private void getCurrentToJSON() {
-		/* default path is /data/data/org.codeandroid.something */
-	
-		Log.i(APPNAME, "Writing settings to JSON"); 
-		try {		
+	private JSONObject getCurrentToJSON() {
 
-			FileOutputStream out; // declare a file output object
-			PrintStream p; // declare a print stream object
+		try {	
+			JSONObject CurrentUI = new JSONObject(); 
 
-			Log.i(APPNAME, "Attempting to write to " + SettingsFile ); 
-			out = new FileOutputStream(SettingsFile);
-			p = new PrintStream( out );
+			CurrentUI.put("IPSec Gateway", IPSEC_Gateway.getText() );
+			CurrentUI.put("IPSec ID", IPSEC_ID.getText() );
+			CurrentUI.put("IPSec secret", IPSEC_Secret.getText() );
+			CurrentUI.put("Xauth", IPSEC_Username.getText() );
 
-			JSONObject JSONSettings = new JSONObject().put("N", "M"); 
-
-			JSONSettings.put("IPSec Gateway", IPSEC_Gateway.getText() );
-			JSONSettings.put("IPSec ID", IPSEC_ID.getText() );
-			JSONSettings.put("IPSec secret", IPSEC_Secret.getText() );
-			JSONSettings.put("Xauth", IPSEC_Username.getText() );
-
-			p.print( JSONSettings.toString() );
-			p.close(); 
-
-		} catch (Exception e) {
-			Log.i(APPNAME, "Can't write to json file"); 
-
+			return CurrentUI;
 		}
-
+		catch (Exception e) {
+			/* FIXME: buggered up somehow , show user let them deal with it */
+			return new JSONObject();
+		}
 	}
 
 }
