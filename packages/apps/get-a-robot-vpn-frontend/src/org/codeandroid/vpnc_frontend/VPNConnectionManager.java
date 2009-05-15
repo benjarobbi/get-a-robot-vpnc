@@ -7,14 +7,14 @@ import android.util.Log;
 
 public class VPNConnectionManager implements OnClickListener {
 	
-	private String APPNAME = "VPNC CONNECTION MANAGER"; 
+	private String TAG = "VPNC CONNECTION MANAGER"; 
 
 	public VPNConnectionManager() {
-		Log.i(APPNAME, "Class  instantiated!");
+		Log.i(TAG, "Class  instantiated!");
 	}
 	
 	public void onClick(View v) {
-		Log.i(APPNAME, "Connect Button Clicked!");
+		Log.i(TAG, "Connect Button Clicked!");
 	}
 
 }
