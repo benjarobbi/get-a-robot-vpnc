@@ -109,10 +109,7 @@ public class VPNC extends Activity implements OnClickListener
 	private OnItemSelectedListener NetworkChoiceListener = new OnItemSelectedListener() {
 		
 		public void onItemSelected(AdapterView parent, View v, int position, long id) {
-
-			int pos = NetworkChoice.getSelectedItemPosition();
-			Log.i(TAG, pos + " selected and position " + position + "passed"); 
-			JSONToCurrent(GetNetworkByIndex( GetNetworkFromConfig(), pos)); 
+			JSONToCurrent(GetNetworkByIndex( GetNetworkFromConfig(), position)); 
 		}
 
 		public void onNothingSelected(AdapterView arg0) {}
