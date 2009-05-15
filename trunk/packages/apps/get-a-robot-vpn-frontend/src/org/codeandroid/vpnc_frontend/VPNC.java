@@ -28,7 +28,7 @@ import org.codeandroid.vpnc_frontend.VPNConnectionManager;
 public class VPNC extends Activity implements OnClickListener
 {
 
-	private String APPNAME = "VPNC";  
+	private String TAG = "VPNC";  
 	public static final String SETTINGS_FILE = "networks.json";
 
 	/* UI Elements*/
@@ -99,7 +99,7 @@ public class VPNC extends Activity implements OnClickListener
 
 	/* Usability improvement */
 	public void onClick(View v) {
-		Log.i(APPNAME, "Field Clicked!");
+		Log.i(TAG, "Field Clicked!");
 		EditText tmp = (EditText) v; 
 		ViewTextBlack(v);
 		tmp.selectAll(); 
@@ -111,7 +111,7 @@ public class VPNC extends Activity implements OnClickListener
 		public void onItemSelected(AdapterView parent, View v, int position, long id) {
 
 			int pos = NetworkChoice.getSelectedItemPosition();
-			Log.i(APPNAME, pos + " selected and position " + position + "passed"); 
+			Log.i(TAG, pos + " selected and position " + position + "passed"); 
 			JSONToCurrent(GetNetworkByIndex( GetNetworkFromConfig(), pos)); 
 		}
 
@@ -148,7 +148,7 @@ public class VPNC extends Activity implements OnClickListener
 
 	/* Pass it the "network" section of the subconfig */  
 	private JSONObject GetNetworkByIndex(JSONArray NetworkList, int Index) {
-		Log.i(APPNAME, "Getting single network from List");
+		Log.i(TAG, "Getting single network from List");
 
 		try {
 			return NetworkList.getJSONObject(Index);
@@ -177,7 +177,7 @@ public class VPNC extends Activity implements OnClickListener
 			}
 
 		} catch (Exception e) {
-			Log.i(APPNAME, "Failed json parsing!");
+			Log.i(TAG, "Failed json parsing!");
 		}
 
 		return NetworkNames;
@@ -228,12 +228,12 @@ public class VPNC extends Activity implements OnClickListener
 			}
 		}
 
-		Log.i(APPNAME, "Done loading settings"); 
+		Log.i(TAG, "Done loading settings"); 
 	}
 
 	/* If there is a variable set, we set it, otherwise leave it blank */
 	private void SetEditTextWidget(EditText e, JSONObject n, String Attribute) {
-		Log.i(APPNAME, "Configuring widget"); 	
+		Log.i(TAG, "Configuring widget"); 	
 
 		try {
 			if (n.has(Attribute) ) {
@@ -245,7 +245,7 @@ public class VPNC extends Activity implements OnClickListener
 			}
 		}
 		catch (Exception d) {
-			Log.i(APPNAME, "We are bloody useless!"); 
+			Log.i(TAG, "We are bloody useless!"); 
 		}
 
 	}
@@ -262,11 +262,11 @@ public class VPNC extends Activity implements OnClickListener
 		}
 		catch (Exception e)  {
 			/* FIXME: better exception handling */ 
-			Log.i(APPNAME, "Problem Converting json to live widgets:"); 
+			Log.i(TAG, "Problem Converting json to live widgets:"); 
 			e.printStackTrace();
 		}
 
-		Log.i(APPNAME,"Done attempting to setup UI!");
+		Log.i(TAG,"Done attempting to setup UI!");
 	}
 
 	/* We grab the settings that the user has changed/made */
