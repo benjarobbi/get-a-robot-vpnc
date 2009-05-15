@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.graphics.Color;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.content.Context;
 
 /* For reading/writing settings to disk */
@@ -28,7 +29,6 @@ public class VPNC extends Activity implements OnClickListener
 {
 
 	private String APPNAME = "VPNC";  
-	private String DATADIR = "/data/data/org.codeandroid.vpnc_frontend/"; 
 	public static final String SETTINGS_FILE = "networks.json";
 
 	/* UI Elements*/
@@ -77,8 +77,7 @@ public class VPNC extends Activity implements OnClickListener
 		ConnectButton = (Button) findViewById(R.id.Connect);
 		ConnectButton.setOnClickListener(ConnectionManager); 
 
-		/* Open the JSON file, lets get a list of networks */ 
-
+		/* Get a list of networks for the spinner */ 
 		String NetworkList[] = NetworkList();
 
 		ArrayAdapter spinnerArrayAdapter = new ArrayAdapter(this,
@@ -88,19 +87,78 @@ public class VPNC extends Activity implements OnClickListener
             	);
 
 		NetworkChoice.setAdapter(spinnerArrayAdapter);
+
+        	NetworkChoice.setOnItemSelectedListener(NetworkChoiceListener);
+	
+	}
+
+	public void ViewTextBlack(View v) {
+		EditText tmp = (EditText) v; 
+		tmp.setTextColor(Color.BLACK);
 	}
 
 	/* Usability improvement */
 	public void onClick(View v) {
-
 		Log.i(APPNAME, "Field Clicked!");
 		EditText tmp = (EditText) v; 
-		tmp.setTextColor(Color.BLACK);
+		ViewTextBlack(v);
 		tmp.selectAll(); 
-
-		Log.i(APPNAME ,"Current JSON data is " + getCurrentToJSON() );
-
 	}
+
+
+	private OnItemSelectedListener NetworkChoiceListener = new OnItemSelectedListener() {
+		
+		public void onItemSelected(AdapterView parent, View v, int position, long id) {
+
+			int pos = NetworkChoice.getSelectedItemPosition();
+			Log.i(APPNAME, pos + " selected and position " + position + "passed"); 
+			JSONToCurrent(GetNetworkByIndex( GetNetworkFromConfig(), pos)); 
+		}
+
+		public void onNothingSelected(AdapterView arg0) {}
+
+	};
+
+	private JSONArray GetNetworkFromConfig() {
+
+		try {	
+			JSONArray networks = new JSONArray(); 
+			networks = ConfigurationSettings.getJSONArray("networks");
+			return networks; 
+		} catch (Exception e) {
+			/* If we mess up, return an empty one ! */ 
+		}
+
+		return new JSONArray(); 
+	}
+
+	/* Pass In a network get its name */
+	private String GetNetworkName (JSONObject network) {
+
+		try {
+			if (network.has("name")) {
+				return network.getString("name").toString(); 
+			}
+		}
+		catch (Exception e) {
+			// FIXME: Shouldnt these do something
+		}
+		return "Unnamed Network";
+	}
+
+	/* Pass it the "network" section of the subconfig */  
+	private JSONObject GetNetworkByIndex(JSONArray NetworkList, int Index) {
+		Log.i(APPNAME, "Getting single network from List");
+
+		try {
+			return NetworkList.getJSONObject(Index);
+		}
+		catch (Exception e) {
+			/* FIXME: handle it */ 
+		}
+		return new JSONObject(); 	
+	}
+
 
 	/* FIXME: return network list from loaded json here.  */ 
 	private String[] NetworkList() {
@@ -108,28 +166,21 @@ public class VPNC extends Activity implements OnClickListener
 		String[] NetworkNames = new String[] { "No networks configured" }; 
 
 		try {
-			Log.i(APPNAME, "Config Names: " + ConfigurationSettings.names() ) ;
 			/* The array of networks */
-			JSONArray networks = ConfigurationSettings.getJSONArray("networks");
-			JSONObject o;
+			JSONArray networks = GetNetworkFromConfig();
 			
 			NetworkNames = new String[networks.length()];
 
 			/* Iterate through each one, find the name setting*/
 			for (int i = 0; i < networks.length(); i++) {
-				o =  networks.getJSONObject(i);
-				if (o.has("name")) {
-					NetworkNames[i] = o.getString("name").toString(); 
-				}
+				NetworkNames[i] = GetNetworkName ( GetNetworkByIndex(networks, i) );
 			}
 
 		} catch (Exception e) {
 			Log.i(APPNAME, "Failed json parsing!");
 		}
 
-		// return new String[] { "Network 1", "Network 2", "Create New Network" };
 		return NetworkNames;
-		
 	}
 
 	/* FIXME: Actually load JSON from disk */ 
@@ -180,17 +231,54 @@ public class VPNC extends Activity implements OnClickListener
 		Log.i(APPNAME, "Done loading settings"); 
 	}
 
+	/* If there is a variable set, we set it, otherwise leave it blank */
+	private void SetEditTextWidget(EditText e, JSONObject n, String Attribute) {
+		Log.i(APPNAME, "Configuring widget"); 	
+
+		try {
+			if (n.has(Attribute) ) {
+				e.setText(n.getString(Attribute)) ;
+				ViewTextBlack(e);
+			}
+			else {
+				e.setText("");
+			}
+		}
+		catch (Exception d) {
+			Log.i(APPNAME, "We are bloody useless!"); 
+		}
+
+	}
+
+	/* Here we set the attributes of the UI elements from the json settings */
+	private void JSONToCurrent(JSONObject network) {
+
+		try {
+			SetEditTextWidget(IPSEC_Gateway, network,  "IPSec gateway");
+			SetEditTextWidget(IPSEC_ID,      network,  "IPSec ID");
+			SetEditTextWidget(IPSEC_Secret,  network , "IPSec secret");
+			SetEditTextWidget(IPSEC_Username,network,  "Xauth"); 
+			SetEditTextWidget(IPSEC_Password,network,  "Password");
+		}
+		catch (Exception e)  {
+			/* FIXME: better exception handling */ 
+			Log.i(APPNAME, "Problem Converting json to live widgets:"); 
+			e.printStackTrace();
+		}
+
+		Log.i(APPNAME,"Done attempting to setup UI!");
+	}
+
 	/* We grab the settings that the user has changed/made */
-	private JSONObject getCurrentToJSON() {
+	private JSONObject CurrentToJSON() {
 
 		try {	
 			JSONObject CurrentUI = new JSONObject(); 
 
-			CurrentUI.put("IPSec Gateway", IPSEC_Gateway.getText() );
+			CurrentUI.put("IPSec gateway", IPSEC_Gateway.getText() );
 			CurrentUI.put("IPSec ID", IPSEC_ID.getText() );
 			CurrentUI.put("IPSec secret", IPSEC_Secret.getText() );
 			CurrentUI.put("Xauth", IPSEC_Username.getText() );
-
 			return CurrentUI;
 		}
 		catch (Exception e) {
