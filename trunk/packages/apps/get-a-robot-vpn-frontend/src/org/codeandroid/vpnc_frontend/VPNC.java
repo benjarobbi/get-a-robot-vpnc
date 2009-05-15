@@ -78,6 +78,7 @@ public class VPNC extends Activity implements OnClickListener
 		ConnectButton.setOnClickListener(ConnectionManager); 
 
 		/* Open the JSON file, lets get a list of networks */ 
+
 		String NetworkList[] = NetworkList();
 
 		ArrayAdapter spinnerArrayAdapter = new ArrayAdapter(this,
@@ -87,7 +88,6 @@ public class VPNC extends Activity implements OnClickListener
             	);
 
 		NetworkChoice.setAdapter(spinnerArrayAdapter);
-
 	}
 
 	/* Usability improvement */
@@ -105,10 +105,30 @@ public class VPNC extends Activity implements OnClickListener
 	/* FIXME: return network list from loaded json here.  */ 
 	private String[] NetworkList() {
 
-				/*
-				return ConfigurationSettings.get("networks");
-				*/
- 				return new String[] { "Network 1", "Network 2", "Create New Network" };
+		String[] NetworkNames = new String[] { "No networks configured" }; 
+
+		try {
+			Log.i(APPNAME, "Config Names: " + ConfigurationSettings.names() ) ;
+			/* The array of networks */
+			JSONArray networks = ConfigurationSettings.getJSONArray("networks");
+			JSONObject o;
+			
+			NetworkNames = new String[networks.length()];
+
+			/* Iterate through each one, find the name setting*/
+			for (int i = 0; i < networks.length(); i++) {
+				o =  networks.getJSONObject(i);
+				if (o.has("name")) {
+					NetworkNames[i] = o.getString("name").toString(); 
+				}
+			}
+
+		} catch (Exception e) {
+			Log.i(APPNAME, "Failed json parsing!");
+		}
+
+		// return new String[] { "Network 1", "Network 2", "Create New Network" };
+		return NetworkNames;
 		
 	}
 
@@ -127,14 +147,13 @@ public class VPNC extends Activity implements OnClickListener
 			int size = (int) fin.getChannel().size();
 			char[] data = new char[size]; // allocate char array of right
 
-			// size
 			irdr.read(data, 0, size); // read into char array
 			irdr.close();
 
 			String contents = new String(data);
+			
 			ConfigurationSettings = new JSONObject(contents); // WORKING  
 			
-
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
