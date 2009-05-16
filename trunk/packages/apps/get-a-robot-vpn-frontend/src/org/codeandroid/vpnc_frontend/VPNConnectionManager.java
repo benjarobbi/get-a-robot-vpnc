@@ -15,6 +15,8 @@ public class VPNConnectionManager implements OnClickListener {
 	
 	public void onClick(View v) {
 		Log.i(TAG, "Connect Button Clicked!");
+		
+		/* Wonder what I can see from here*/
 	}
 
 }
