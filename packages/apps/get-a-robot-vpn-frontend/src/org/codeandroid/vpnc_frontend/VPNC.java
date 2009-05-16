@@ -9,6 +9,7 @@ import android.view.View;
 import android.graphics.Color;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.view.View.OnFocusChangeListener;
 import android.content.Context;
 
 /* For reading/writing settings to disk */
@@ -20,10 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-
 /* For managing and setting up the connection */
 import org.codeandroid.vpnc_frontend.VPNConnectionManager;
-
 
 public class VPNC extends Activity implements OnClickListener
 {
@@ -61,18 +60,23 @@ public class VPNC extends Activity implements OnClickListener
 
 		IPSEC_Gateway = (EditText) findViewById(R.id.IPSEC_Gateway); 
 		IPSEC_Gateway.setOnClickListener(this);
+		IPSEC_Gateway.setOnFocusChangeListener(update_config);
 
 		IPSEC_ID = (EditText) findViewById(R.id.IPSEC_ID); 
 		IPSEC_ID.setOnClickListener(this);
+		IPSEC_ID.setOnFocusChangeListener(update_config);
 
 		IPSEC_Secret = (EditText) findViewById(R.id.IPSEC_Secret); 
 		IPSEC_Secret.setOnClickListener(this);
+		IPSEC_Secret.setOnFocusChangeListener(update_config);
 
 		IPSEC_Username = (EditText) findViewById(R.id.IPSEC_Username); 
 		IPSEC_Username.setOnClickListener(this);
+		IPSEC_Username.setOnFocusChangeListener(update_config);
 
 		IPSEC_Password = (EditText) findViewById(R.id.IPSEC_Password); 
 		IPSEC_Password.setOnClickListener(this);
+		IPSEC_Password.setOnFocusChangeListener(update_config);
 
 		ConnectButton = (Button) findViewById(R.id.Connect);
 		ConnectButton.setOnClickListener(ConnectionManager); 
@@ -105,6 +109,16 @@ public class VPNC extends Activity implements OnClickListener
 		tmp.selectAll(); 
 	}
 
+	private final OnFocusChangeListener update_config = new OnFocusChangeListener() {
+                public void onFocusChange(View v, boolean hasFocus) {
+
+			/* We want to save when the user moves out of focus */
+			if (!hasFocus) {
+				Log.i(TAG,"We have no focus!");
+				/* FIXME: Save here */ 
+			}
+                }
+        };
 
 	private OnItemSelectedListener NetworkChoiceListener = new OnItemSelectedListener() {
 		
@@ -119,9 +133,7 @@ public class VPNC extends Activity implements OnClickListener
 	private JSONArray GetNetworkFromConfig() {
 
 		try {	
-			JSONArray networks = new JSONArray(); 
-			networks = ConfigurationSettings.getJSONArray("networks");
-			return networks; 
+			return ConfigurationSettings.getJSONArray("networks");
 		} catch (Exception e) {
 			/* If we mess up, return an empty one ! */ 
 		}
@@ -157,17 +169,17 @@ public class VPNC extends Activity implements OnClickListener
 	}
 
 
-	/* FIXME: return network list from loaded json here.  */ 
 	private String[] NetworkList() {
 
-		String[] NetworkNames = new String[] { "No networks configured" }; 
+		String[] NetworkNames = new String[] { "Create new network" }; 
+		int last = 0;
 
 		try {
 			/* The array of networks */
 			JSONArray networks = GetNetworkFromConfig();
+			NetworkNames = new String[networks.length() + 1];
+			last = networks.length();
 			
-			NetworkNames = new String[networks.length()];
-
 			/* Iterate through each one, find the name setting*/
 			for (int i = 0; i < networks.length(); i++) {
 				NetworkNames[i] = GetNetworkName ( GetNetworkByIndex(networks, i) );
@@ -176,6 +188,8 @@ public class VPNC extends Activity implements OnClickListener
 		} catch (Exception e) {
 			Log.i(TAG, "Failed json parsing!");
 		}
+
+		 NetworkNames[last] =  "Configure New network" ;
 
 		return NetworkNames;
 	}
@@ -238,6 +252,7 @@ public class VPNC extends Activity implements OnClickListener
 				ViewTextBlack(e);
 			}
 			else {
+				Log.i(TAG, "No attribute set");
 				e.setText("");
 			}
 		}
@@ -276,6 +291,7 @@ public class VPNC extends Activity implements OnClickListener
 			CurrentUI.put("IPSec ID", IPSEC_ID.getText() );
 			CurrentUI.put("IPSec secret", IPSEC_Secret.getText() );
 			CurrentUI.put("Xauth", IPSEC_Username.getText() );
+			CurrentUI.put("Password", IPSEC_Password.getText() );
 			return CurrentUI;
 		}
 		catch (Exception e) {
