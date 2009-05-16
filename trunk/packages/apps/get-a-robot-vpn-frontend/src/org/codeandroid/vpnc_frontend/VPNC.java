@@ -123,14 +123,14 @@ public class VPNC extends Activity implements OnClickListener
 	private OnItemSelectedListener NetworkChoiceListener = new OnItemSelectedListener() {
 		
 		public void onItemSelected(AdapterView parent, View v, int position, long id) {
-			JSONToCurrent(GetNetworkByIndex( GetNetworkFromConfig(), position)); 
+			JSONToCurrent(GetNetworkByIndex( GetNetworksFromConfig(), position)); 
 		}
 
 		public void onNothingSelected(AdapterView arg0) {}
 
 	};
 
-	private JSONArray GetNetworkFromConfig() {
+	private JSONArray GetNetworksFromConfig() {
 
 		try {	
 			return ConfigurationSettings.getJSONArray("networks");
@@ -176,7 +176,7 @@ public class VPNC extends Activity implements OnClickListener
 
 		try {
 			/* The array of networks */
-			JSONArray networks = GetNetworkFromConfig();
+			JSONArray networks = GetNetworksFromConfig();
 			NetworkNames = new String[networks.length() + 1];
 			last = networks.length();
 			
