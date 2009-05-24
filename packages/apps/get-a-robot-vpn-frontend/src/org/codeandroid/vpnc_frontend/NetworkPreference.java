@@ -14,7 +14,7 @@ import android.app.Activity;
 import org.codeandroid.vpnc_frontend.NetworkDialog;
 import org.codeandroid.vpnc_frontend.NetworkDatabase;
 
-public class NetworkPreference extends Preference implements OnPreferenceClickListener {
+public class NetworkPreference extends Preference  {
 
 	public int _id = -1;
 
@@ -24,8 +24,11 @@ public class NetworkPreference extends Preference implements OnPreferenceClickLi
 
 	public NetworkPreference(Context context, AttributeSet attrs) {
 		super(context,attrs);
-		this.setOnPreferenceClickListener(this);
 		Log.i(TAG, "Creating new NetworkPreference");
+	}
+
+	public int getid() {
+		return _id;
 	}
 
 	@Override
@@ -35,16 +38,6 @@ public class NetworkPreference extends Preference implements OnPreferenceClickLi
 
 	public void refreshNetworkState() {
 		// FIXME: refresh self state
-	}
-
-	@Override
-	public boolean onPreferenceClick(Preference pref) {
-		Log.i(TAG, "On pref clicked id is " + _id );
-		Context c = getContext();
-               	Intent i = new Intent(c, NetworkEditor.class);
-              	i.putExtra( Intent.EXTRA_TITLE , _id );
-		c.startActivity(i);
-		return true;
 	}
 
 }

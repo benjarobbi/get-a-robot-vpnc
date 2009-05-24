@@ -32,9 +32,10 @@ public class NetworkDialog extends AlertDialog implements DialogInterface.OnClic
 
 		super(context);
 		if (_id == -1) {
-			this.setTitle("New Network: ");
+			setTitle("New Network: ");
 		}
 		else {
+			setTitle("Edit Network: ");
 			NetworkDatabase n = new NetworkDatabase(context);
 			// FIXME: Load from ID here. 
 		}
