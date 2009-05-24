@@ -19,16 +19,16 @@ import org.codeandroid.vpnc_frontend.NetworkPreference;
 import org.codeandroid.vpnc_frontend.ProgressCategory;
 import android.preference.Preference.OnPreferenceClickListener;
 
-public class VPNC extends PreferenceActivity 
+public class VPNC extends PreferenceActivity implements OnPreferenceClickListener
 {
 
-	PreferenceGroup NetworkList;
 	private final String TAG = "VPNC";
-	private ProgressCategory NL;
+	private ProgressCategory NetworkList;
 	private CheckBoxPreference VPNEnabled;
 
 	public NetworkDatabase ndb;
 	public Cursor networks;
+	private final int SUB_ACTIVITY_REQUEST_CODE = 1;
 
     /** Called when the activity is first created. */
     @Override
@@ -37,22 +37,23 @@ public class VPNC extends PreferenceActivity
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.vpnc_settings);
 
-		NL = (ProgressCategory ) findPreference("network_list");
+		NetworkList = (ProgressCategory ) findPreference("network_list");
+		NetworkList.setOnPreferenceClickListener(this);
+
 		VPNEnabled = (CheckBoxPreference ) findPreference("VPN");
 
 		ShowNetworks();
 
 		Preference AddNew = (Preference) findPreference("add_another_network");
-		Intent i = new Intent(new Intent(this, NetworkEditor.class));
-
-		/* Add new is always -1 */
-		i.putExtra( Intent.EXTRA_TITLE , -1 );
-        AddNew.setIntent(i);
-
+		AddNew.setOnPreferenceClickListener(this);
 	}
 
 
+	/* I've been told that i should change this to use an adapter */ 
 	private void ShowNetworks() {
+
+		/* Remove all the networks, this is a full refresh */
+		NetworkList.removeAll();
 
 		NetworkDatabase n = new NetworkDatabase(this);
 		Cursor cursor = n.allNetworks();
@@ -69,14 +70,42 @@ public class VPNC extends PreferenceActivity
 			pref.setTitle(nickname);
 			pref.setEnabled(true);
 			pref._id = _id;
-			/*
-          	Intent i = new Intent(new Intent(this, NetworkEditor.class));
-           	i.putExtra( Intent.EXTRA_TITLE , _id );
-           	pref.setIntent(i);
-			*/
-			NL.addPreference(pref);
+			pref.setOnPreferenceClickListener(this);
+			NetworkList.addPreference(pref);
 		}
 	
 		cursor.close();
 	}
+
+	@Override
+ 	public boolean onPreferenceClick(Preference p ){
+
+		Log.i(TAG, "IN VPNC.java onpreferenceclick");
+		Log.i(TAG, "key is: " + p.getKey());
+
+		int id = 0;
+
+		Intent intent = new Intent(this, NetworkEditor.class);
+
+		if ("add_another_network".equals( p.getKey() )) {
+			// We set a different WORKING.
+			Log.i(TAG, "Setting Intent for new network");
+			intent.putExtra(Intent.EXTRA_TITLE , -1 );
+		}
+		else {
+			Log.i(TAG, "Not add_another_network");
+			NetworkPreference n = (NetworkPreference) p;
+			id = n.getid();
+			intent.putExtra(Intent.EXTRA_TITLE , n.getid() );
+		}
+		startActivityForResult(intent, SUB_ACTIVITY_REQUEST_CODE);
+		return true; 
+	}
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		Log.i(TAG, "On Activity Result: resultcode" + resultCode);
+		ShowNetworks();
+	}
+
 }

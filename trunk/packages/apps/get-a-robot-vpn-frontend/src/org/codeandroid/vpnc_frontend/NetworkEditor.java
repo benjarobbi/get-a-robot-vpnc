@@ -25,6 +25,8 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
     public static final String LOG_TAG = "VPNC";
     private static final String PREFIX = NetworkEditor.class.getSimpleName() + ":";
 	
+    public static final int NEW_CONNECTION = -1;
+
 	public class CursorPreferenceHack implements SharedPreferences {
 		
 		protected final SQLiteDatabase db;
@@ -37,13 +39,12 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 			this.db = db;
 			this.table = table;
 			this.id = id;
-			
 			this.cacheValues();
-			
 		}
-		
+	
 		protected void cacheValues() {
-			
+		
+			if (_id != NEW_CONNECTION) {
 			Cursor cursor = db.query(table, null, "_id = ?",
 					new String[] { Integer.toString(id) }, null, null, null);
 
@@ -56,8 +57,7 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 			}
 			
 			cursor.close();
-
-			Log.d(LOG_TAG, PREFIX + "cacheValues - End");
+			}
 			
 		}
 		
@@ -165,12 +165,10 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 
 		public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
 			listeners.add(listener);
-			Log.d(LOG_TAG, PREFIX + "registerOnSharedPreferenceChangeListener - End");
 		}
 
 		public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
 			listeners.remove(listener);
-			Log.d(LOG_TAG, PREFIX + "unregisterOnSharedPreferenceChangeListener - End");
 		}
 		
 	}
@@ -183,14 +181,14 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 	}
 	
 	public CursorPreferenceHack pref;
-	public int _id = -1;
+	public int _id = NEW_CONNECTION;
 	NetworkDatabase db;
 	
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		db = new NetworkDatabase(this);
-		_id = this.getIntent().getIntExtra(Intent.EXTRA_TITLE, -1);
+		_id = this.getIntent().getIntExtra(Intent.EXTRA_TITLE, NEW_CONNECTION);
 		
 		this.pref = new CursorPreferenceHack(db.getWritableDatabase(), db.TABLE_NETWORKS, _id);
 		this.pref.registerOnSharedPreferenceChangeListener(this);
@@ -199,8 +197,11 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 		/* Hook up save */ 
 		Preference p = (Preference) findPreference("save");
 		p.setOnPreferenceClickListener(this);
-	
-		this.updateSummaries();
+
+		if (_id != NEW_CONNECTION) {	
+			this.updateSummaries();
+		}
+
 		Log.d(LOG_TAG, PREFIX + "onCreate - End");
 	}
 	
@@ -236,7 +237,7 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 			String password = GetSummary("password");
 
 			if (_id == -1) {
-			db.createNetwork(this.pref.db, nickname, IPSec_gateway, 
+				db.createNetwork(this.pref.db, nickname, IPSec_gateway, 
 							IPSec_ID, IPSec_secret, Xauth, password);
 			}
 			else {
@@ -244,7 +245,7 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 							IPSec_ID, IPSec_secret, Xauth, password);
 			}
 			
-			// NetworkEditor.this.setResult(1, "done updating");
+			setResult(RESULT_OK);
   			finish();
   			Log.d(LOG_TAG, PREFIX + "onPreferenceClick - End");
 			return true; 
