@@ -14,13 +14,16 @@ import android.content.Intent;
 
 import android.widget.ListView;
 import android.database.Cursor;
+import android.widget.AdapterView;
 
 import org.codeandroid.vpnc_frontend.NetworkPreference;
 import org.codeandroid.vpnc_frontend.ProgressCategory;
+import org.codeandroid.vpnc_frontend.NetworkDialog;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView;
 
-public class VPNC extends PreferenceActivity implements OnPreferenceClickListener
-{
+public class VPNC extends PreferenceActivity implements OnPreferenceClickListener, OnItemLongClickListener {
 
 	private final String TAG = "VPNC";
 	private ProgressCategory NetworkList;
@@ -28,7 +31,15 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 	public NetworkDatabase ndb;
 	public Cursor networks;
+
 	private final int SUB_ACTIVITY_REQUEST_CODE = 1;
+
+	private ListView lv;
+
+	private final int VPN_ENABLE = 1;
+	private final int VPN_NOTIFICATIONS = 2;
+	private final int ADD_NETWORK = 4;
+
 
     /** Called when the activity is first created. */
     @Override
@@ -37,15 +48,19 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.vpnc_settings);
 
+		VPNEnabled = (CheckBoxPreference ) findPreference("VPN");
+
 		NetworkList = (ProgressCategory ) findPreference("network_list");
 		NetworkList.setOnPreferenceClickListener(this);
+		
+		Preference AddNew = (Preference) findPreference("add_another_network");
+		AddNew.setOnPreferenceClickListener(this);
 
-		VPNEnabled = (CheckBoxPreference ) findPreference("VPN");
+			lv = getListView();
+			lv.setOnItemLongClickListener (this);
 
 		ShowNetworks();
 
-		Preference AddNew = (Preference) findPreference("add_another_network");
-		AddNew.setOnPreferenceClickListener(this);
 	}
 
 
@@ -78,24 +93,49 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	}
 
 	@Override
+	public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id)
+	{
+		Log.i(TAG, "LONG PRESS ID IS " +  " Pos: " + pos + " ID: " + id );
+		Log.i(TAG, "Switching on: " + id ) ;
+
+		switch((int)id) {
+			case VPN_ENABLE:
+				Log.i(TAG, "long press handler skipping vpn checkbox");
+				break;
+			case VPN_NOTIFICATIONS:
+				Log.i(TAG, "long press handler skipping notifications checkbox");
+				break;
+
+			case ADD_NETWORK:
+				Log.i(TAG, "long press handler skipping add button");
+				break; 
+
+			default:
+				Log.i(TAG, "long press handler, handling the choice");
+				NetworkPreference p = (NetworkPreference)av.getItemAtPosition(pos);
+				Log.i(TAG, "Loading networkpreference " + p.getid() ) ;
+				NetworkDialog dialog = new NetworkDialog(this, p.getid() );
+				dialog.show();
+				return true;
+		}
+
+		// Should be handled by single clicks.
+		return false;
+	}
+
+	@Override
  	public boolean onPreferenceClick(Preference p ){
 
-		Log.i(TAG, "IN VPNC.java onpreferenceclick");
-		Log.i(TAG, "key is: " + p.getKey());
-
 		int id = 0;
-
 		Intent intent = new Intent(this, NetworkEditor.class);
 
 		if ("add_another_network".equals( p.getKey() )) {
-			// We set a different WORKING.
 			Log.i(TAG, "Setting Intent for new network");
 			intent.putExtra(Intent.EXTRA_TITLE , -1 );
 		}
 		else {
-			Log.i(TAG, "Not add_another_network");
+			Log.i(TAG, "Settings Intent for Existing network");
 			NetworkPreference n = (NetworkPreference) p;
-			id = n.getid();
 			intent.putExtra(Intent.EXTRA_TITLE , n.getid() );
 		}
 		startActivityForResult(intent, SUB_ACTIVITY_REQUEST_CODE);
@@ -107,5 +147,4 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		Log.i(TAG, "On Activity Result: resultcode" + resultCode);
 		ShowNetworks();
 	}
-
 }

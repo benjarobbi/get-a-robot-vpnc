@@ -4,21 +4,16 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.InputType;
-import android.text.TextUtils;
 import android.text.format.Formatter;
-import android.text.method.PasswordTransformationMethod;
-import android.text.method.TransformationMethod;
 import android.util.Log;
-import android.view.View;
+import android.view.View; 
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Button;
+import android.view.View.OnClickListener; 
 
 public class NetworkDialog extends AlertDialog implements DialogInterface.OnClickListener,
         AdapterView.OnItemSelectedListener, View.OnClickListener {
@@ -28,24 +23,62 @@ public class NetworkDialog extends AlertDialog implements DialogInterface.OnClic
 
 	private View mView;
 
-    	public NetworkDialog(Context context, int _id) {
+	Button connect;
+	Button disconnect;
+	Button edit;
+	int _id;
 
+    	public NetworkDialog(Context context, int id) {
 		super(context);
-		if (_id == -1) {
-			setTitle("New Network: ");
-		}
-		else {
-			setTitle("Edit Network: ");
-			NetworkDatabase n = new NetworkDatabase(context);
-			// FIXME: Load from ID here. 
-		}
+		_id = id;
+	}
+
+	public void configureButtons() {
+
+		connect = (Button) mView.findViewById(R.id.connect);
+
+		disconnect = (Button) findViewById(R.id.disconnect);
+		edit = (Button) findViewById(R.id.edit);
+
+		connect.setOnClickListener( 
+			new Button.OnClickListener() {
+				@Override
+           			public void onClick(View v) {
+					Log.i(TAG, "Connect Clicked");
+                 	 	}
+			} 
+		);
+
+		disconnect.setOnClickListener( 
+			new Button.OnClickListener() {
+				@Override
+           			public void onClick(View v) {
+					Log.i(TAG, "Disconnect Clicked");
+                 	 	}
+			} 
+		);
+
+		edit.setOnClickListener( 
+			new Button.OnClickListener() {
+				@Override
+           			public void onClick(View v) {
+					Log.i(TAG, "Edit Clicked");
+                 	 	}
+			} 
+		);
+
+
+
 
 	}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+	setTitle("Options");
 	onLayout();
         super.onCreate(savedInstanceState);
+	configureButtons();
+	
     }
 
     public void onLayout() {
