@@ -37,4 +37,8 @@
 <string name="vpn_show_password">Show Password</string>
 <string name="please_type_secret">Enter group secret</string>
 <string name="save_settings">Save Settings</string>
+
+<string name="connect">Connect</string>
+<string name="disconnect">Disconnect</string>
+<string name="edit">Configure</string>
 </resources>

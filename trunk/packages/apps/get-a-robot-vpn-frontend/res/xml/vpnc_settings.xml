@@ -17,6 +17,7 @@
 
     <org.codeandroid.vpnc_frontend.ProgressCategory
             android:key="network_list"
+	    android:id="@+id/progress_category"
             android:dependency="VPN"
             android:title="@string/vpn_network_listing" 
             android:persistent="false" />
