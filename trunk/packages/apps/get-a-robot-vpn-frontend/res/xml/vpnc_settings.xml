@@ -9,7 +9,7 @@
 	android:defaultValue="false" />
 
 	<CheckBoxPreference
-	android:key="notification" 
+	android:key="NOTIFICATION" 
 	android:title="@string/notificaton_title" 
 	android:summary="@string/notification_summary" 
 	android:dependency="VPN"
@@ -24,7 +24,7 @@
 
         <PreferenceScreen
 		android:title="@string/vpn_add_another_network"
-		android:key="add_another_network"
+		android:key="ADD_NETWORK"
 		android:summary="@string/vpn_add_another_network_summary"> 
 	</PreferenceScreen>
 

@@ -227,7 +227,7 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 		return S; 
 	}
 
-	@Override
+	// @Override
   	public boolean onPreferenceClick  (Preference preference)  {
 			String nickname = GetSummary("nickname");
 			String IPSec_gateway = GetSummary("IPSec_gateway");
@@ -237,11 +237,11 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 			String password = GetSummary("password");
 
 			if (_id == -1) {
-				db.createNetwork(this.pref.db, nickname, IPSec_gateway, 
+				db.createNetwork( nickname, IPSec_gateway, 
 							IPSec_ID, IPSec_secret, Xauth, password);
 			}
 			else {
-				db.updateNetwork(this.pref.db, _id, nickname, IPSec_gateway, 
+				db.updateNetwork( _id, nickname, IPSec_gateway, 
 							IPSec_ID, IPSec_secret, Xauth, password);
 			}
 			

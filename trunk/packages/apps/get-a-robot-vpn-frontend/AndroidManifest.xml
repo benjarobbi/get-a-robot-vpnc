@@ -7,8 +7,12 @@
 
         <activity android:name=".NetworkEditor"
                   android:label="@string/add_network">
-    
-		</activity>  
+	</activity>
+ 
+        <activity android:name=".NetworkManager"
+                  android:label="@string/manage_network">
+	</activity>  
+
         <activity android:name=".VPNC"
                   android:label="@string/app_name">
             <intent-filter>

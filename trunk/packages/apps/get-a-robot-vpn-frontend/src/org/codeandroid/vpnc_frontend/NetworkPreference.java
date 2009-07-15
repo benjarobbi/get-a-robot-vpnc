@@ -13,8 +13,9 @@ import android.app.Activity;
 
 import org.codeandroid.vpnc_frontend.NetworkDialog;
 import org.codeandroid.vpnc_frontend.NetworkDatabase;
+import android.preference.Preference.OnPreferenceClickListener;
 
-public class NetworkPreference extends Preference  {
+public class NetworkPreference extends Preference implements OnPreferenceClickListener  {
 
 	public int _id = -1;
 
@@ -24,6 +25,8 @@ public class NetworkPreference extends Preference  {
 
 	public NetworkPreference(Context context, AttributeSet attrs) {
 		super(context,attrs);
+		mycontext = context;
+		setOnPreferenceClickListener(this);
 		Log.i(TAG, "Creating new NetworkPreference");
 	}
 
@@ -31,13 +34,14 @@ public class NetworkPreference extends Preference  {
 		return _id;
 	}
 
-	@Override
-	protected void onBindView(View view) {
-		super.onBindView(view);
-	}
-
 	public void refreshNetworkState() {
 		// FIXME: refresh self state
 	}
 
+	public boolean onPreferenceClick(Preference preference) {
+ 		Intent myIntent = new Intent(mycontext, NetworkManager.class);
+		myIntent.putExtra(Intent.EXTRA_TITLE , _id );
+		mycontext.startActivity(myIntent);
+		return true;
+	}
 }
