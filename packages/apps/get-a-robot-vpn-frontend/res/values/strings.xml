@@ -11,6 +11,7 @@
 <string name="vpn_add_another_network_summary">Configure a connectiont to a VPN network</string> 
 <string name="vpn_network_listing">VPN Networks</string> 
 <string name="add_network">Add VPN Network</string> 
+<string name="manage_network">Manage VPN Network</string> 
 <string name="edit_network">Edit VPN Network</string> 
 <string name="title_nickname"> Connection Name </string>
 <string name="dialog_title_nickname_preference"> Name which refers to network </string> 

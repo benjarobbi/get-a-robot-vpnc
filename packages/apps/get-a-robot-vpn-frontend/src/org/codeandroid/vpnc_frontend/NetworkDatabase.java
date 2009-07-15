@@ -1,8 +1,5 @@
 package org.codeandroid.vpnc_frontend;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import android.util.Log;
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,8 +26,8 @@ public class NetworkDatabase extends SQLiteOpenHelper {
 	public final static String FIELD_KEY_NAME = "nickname";
 	public final static String FIELD_KEY_PRIVATE = "private";
 	
-    public static final String LOG_TAG = "VPNC";
-    private static final String PREFIX = NetworkDatabase.class.getSimpleName() + ":";
+	public static final String LOG_TAG = "VPNC";
+	private static final String PREFIX = NetworkDatabase.class.getSimpleName() + ":";
 	
 	public NetworkDatabase(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -49,14 +46,12 @@ public class NetworkDatabase extends SQLiteOpenHelper {
 				+ FIELD_NETWORK_SECRET + " TEXT, "
 				+ FIELD_NETWORK_LASTCONNECT + " INTEGER) ");
 
-
-		// Sample network.
-		// this.createNetwork(db, "name", "vpn4.domain.com", "id", "secret", "usrnm","pwd");
 		Log.d(LOG_TAG, PREFIX + "onCreate - End");
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
 		Log.d(LOG_TAG, PREFIX + "onUpgrade - Start");
 		Log.d(LOG_TAG, PREFIX + "registerLocationListener - Start");
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_NETWORKS);
@@ -65,11 +60,9 @@ public class NetworkDatabase extends SQLiteOpenHelper {
 	}
 
 	/* Should only be called for new  networks */	
-	public long createNetwork(SQLiteDatabase db, String nickname, String gateway, String id, String secret, String username, String password) {
+	public long createNetwork(String nickname, String gateway, String id, String secret, String username, String password) {
 
-		Log.d(LOG_TAG, PREFIX + "createNetwork - Start");
-	
-		if(db == null) db = this.getWritableDatabase();
+		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues values = new ContentValues();
 		values.put(FIELD_NETWORK_NICKNAME, nickname);
@@ -83,7 +76,9 @@ public class NetworkDatabase extends SQLiteOpenHelper {
 	}
 
 	/* Updates a  network based on the _id  */
-	public long updateNetwork(SQLiteDatabase db, int _id, String nickname, String gateway, String id, String secret, String username, String password) {
+	public long updateNetwork(int _id, String nickname, String gateway, String id, String secret, String username, String password) {
+
+		SQLiteDatabase db = this.getReadableDatabase();
 
 		ContentValues values = new ContentValues();
 		values.put(FIELD_NETWORK_NICKNAME, _id);
@@ -108,6 +103,27 @@ public class NetworkDatabase extends SQLiteOpenHelper {
 				null, null, null, null, sortField + " DESC");
 	}
 
-	
+	public Cursor singleNetwork(int id) {
+		Log.d(LOG_TAG, PREFIX + "singleNetwork - Start");
+		String sortField =  FIELD_NETWORK_LASTCONNECT;
+		String where = KEY_ROWID + "=" + id;
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		return db.query(TABLE_NETWORKS, new String[] { "_id", FIELD_NETWORK_NICKNAME,
+				FIELD_NETWORK_USERNAME, FIELD_NETWORK_PASSWORD,
+				FIELD_NETWORK_GATEWAY, FIELD_NETWORK_ID,
+				FIELD_NETWORK_SECRET, FIELD_NETWORK_LASTCONNECT },
+				where, null, null, null, sortField + " DESC");
+	}
+
+	/* id is the rowid of the network you want to delete
+ 	 * returns the amount of rows deleted, (should be 1)
+ 	 */
+	public long deleteNetwork(long id) {
+		Log.d(LOG_TAG, PREFIX + "Deleting network");
+		SQLiteDatabase db = this.getReadableDatabase();
+		return db.delete(TABLE_NETWORKS, KEY_ROWID + "=" + id, null);
+	}
+
 }
 

@@ -3,4 +3,8 @@ TODO:
 	WIDGETS
 
 
+Ok. Made some changes. I placed a copy of the sample.xml file in the /res/raw and the /res/xml directories (not sure which one to use). I tried this line and am getting an error: "context cannot be resolved":
+
+istream = context.getResources().openRawResource(R.raw.sample);
+
 

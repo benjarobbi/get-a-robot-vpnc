@@ -48,6 +48,7 @@
         classname="com.android.ant.SetupTask"
         classpathref="android.antlibs"/>
 
+
     <!-- Execute the Android Setup task that will setup some properties specific to the target,
          and import the rules files.
          To customize the rules, copy/paste them below the task, and disable import by setting
@@ -57,5 +58,6 @@
          This will ensure that the properties are setup correctly but that your customized
          targets are used.
     -->
-    <setup />
+
+   <setup />
 </project>
