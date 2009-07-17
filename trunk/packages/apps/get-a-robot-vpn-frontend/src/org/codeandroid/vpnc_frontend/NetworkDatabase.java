@@ -1,5 +1,8 @@
 package org.codeandroid.vpnc_frontend;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.util.Log;
 import android.content.ContentValues;
 import android.content.Context;
@@ -60,60 +63,115 @@ public class NetworkDatabase extends SQLiteOpenHelper {
 	}
 
 	/* Should only be called for new  networks */	
-	public long createNetwork(String nickname, String gateway, String id, String secret, String username, String password) {
+	public long createNetwork(NetworkConnectionInfo connectionInfo) {
 
 		SQLiteDatabase db = this.getWritableDatabase();
-
-		ContentValues values = new ContentValues();
-		values.put(FIELD_NETWORK_NICKNAME, nickname);
-		values.put(FIELD_NETWORK_GATEWAY, gateway);
-		values.put(FIELD_NETWORK_ID, id);
-		values.put(FIELD_NETWORK_SECRET, secret);
-		values.put(FIELD_NETWORK_USERNAME, username);
-		values.put(FIELD_NETWORK_PASSWORD, password);
-		values.put(FIELD_NETWORK_LASTCONNECT, Integer.MAX_VALUE);
-		return db.insert(TABLE_NETWORKS, null, values);
+		try
+		{
+			ContentValues values = new ContentValues();
+			values.put(FIELD_NETWORK_NICKNAME, connectionInfo.getNetworkName());
+			values.put(FIELD_NETWORK_GATEWAY, connectionInfo.getIpSecGateway());
+			values.put(FIELD_NETWORK_ID, connectionInfo.getIpSecId());
+			values.put(FIELD_NETWORK_SECRET, connectionInfo.getIpSecSecret());
+			values.put(FIELD_NETWORK_USERNAME, connectionInfo.getXauth());
+			values.put(FIELD_NETWORK_PASSWORD, connectionInfo.getPassword());
+			values.put(FIELD_NETWORK_LASTCONNECT, Integer.MAX_VALUE);
+			return db.insert(TABLE_NETWORKS, null, values);
+		}
+		finally
+		{
+			db.close();
+		}
 	}
 
 	/* Updates a  network based on the _id  */
-	public long updateNetwork(int _id, String nickname, String gateway, String id, String secret, String username, String password) {
+	public long updateNetwork(NetworkConnectionInfo connectionInfo) {
 
-		SQLiteDatabase db = this.getReadableDatabase();
-
-		ContentValues values = new ContentValues();
-		values.put(FIELD_NETWORK_NICKNAME, _id);
-		values.put(FIELD_NETWORK_NICKNAME, nickname);
-		values.put(FIELD_NETWORK_GATEWAY, gateway);
-		values.put(FIELD_NETWORK_ID, id);
-		values.put(FIELD_NETWORK_SECRET, secret);
-		values.put(FIELD_NETWORK_USERNAME, username);
-		values.put(FIELD_NETWORK_PASSWORD, password);
-		values.put(FIELD_NETWORK_LASTCONNECT, Integer.MAX_VALUE);
-		return db.update(TABLE_NETWORKS,values,KEY_ROWID+"="+_id, null);
+		SQLiteDatabase db = this.getWritableDatabase();
+		try
+		{
+			ContentValues values = new ContentValues();
+			values.put(FIELD_NETWORK_NICKNAME, connectionInfo.getNetworkName());
+			values.put(FIELD_NETWORK_GATEWAY, connectionInfo.getIpSecGateway());
+			values.put(FIELD_NETWORK_ID, connectionInfo.getIpSecId());
+			values.put(FIELD_NETWORK_SECRET, connectionInfo.getIpSecSecret());
+			values.put(FIELD_NETWORK_USERNAME, connectionInfo.getXauth());
+			values.put(FIELD_NETWORK_PASSWORD, connectionInfo.getPassword());
+			values.put(FIELD_NETWORK_LASTCONNECT, Integer.MAX_VALUE);
+			return db.update(TABLE_NETWORKS, values, KEY_ROWID+"="+connectionInfo.getId(), null);
+		}
+		finally
+		{
+			db.close();
+		}
 	}
 	
-	public Cursor allNetworks() {
+	public List<NetworkConnectionInfo> allNetworks() {
 		Log.d(LOG_TAG, PREFIX + "allNetworks - Start");
+		List<NetworkConnectionInfo> connectionInfos = new ArrayList<NetworkConnectionInfo>();
 		String sortField =  FIELD_NETWORK_LASTCONNECT;
 		
 		SQLiteDatabase db = this.getReadableDatabase();
-		return db.query(TABLE_NETWORKS, new String[] { "_id", FIELD_NETWORK_NICKNAME,
-				FIELD_NETWORK_USERNAME, FIELD_NETWORK_GATEWAY, FIELD_NETWORK_ID,
-				FIELD_NETWORK_SECRET, FIELD_NETWORK_LASTCONNECT },
-				null, null, null, null, sortField + " DESC");
+		try
+		{
+			Cursor cursor = db.query(TABLE_NETWORKS, new String[] { KEY_ROWID, FIELD_NETWORK_NICKNAME, FIELD_NETWORK_USERNAME, 
+					FIELD_NETWORK_PASSWORD, FIELD_NETWORK_GATEWAY, FIELD_NETWORK_ID, FIELD_NETWORK_SECRET, FIELD_NETWORK_LASTCONNECT},
+					null, null, null, null, sortField + " DESC");
+			while( cursor.moveToNext() )
+			{
+				connectionInfos.add( getNetworkConnectionInfo(cursor) );
+			}
+			cursor.close();
+			return connectionInfos;
+		}
+		finally
+		{
+			db.close();
+		}
 	}
 
-	public Cursor singleNetwork(int id) {
+	public NetworkConnectionInfo singleNetwork(int id) {
 		Log.d(LOG_TAG, PREFIX + "singleNetwork - Start");
-		String sortField =  FIELD_NETWORK_LASTCONNECT;
 		String where = KEY_ROWID + "=" + id;
 		
 		SQLiteDatabase db = this.getReadableDatabase();
-		return db.query(TABLE_NETWORKS, new String[] { "_id", FIELD_NETWORK_NICKNAME,
-				FIELD_NETWORK_USERNAME, FIELD_NETWORK_PASSWORD,
-				FIELD_NETWORK_GATEWAY, FIELD_NETWORK_ID,
-				FIELD_NETWORK_SECRET, FIELD_NETWORK_LASTCONNECT },
-				where, null, null, null, sortField + " DESC");
+		try
+		{
+			Cursor cursor = db.query(TABLE_NETWORKS, new String[] { KEY_ROWID, FIELD_NETWORK_NICKNAME, FIELD_NETWORK_USERNAME, 
+									FIELD_NETWORK_PASSWORD, FIELD_NETWORK_GATEWAY, FIELD_NETWORK_ID, FIELD_NETWORK_SECRET, FIELD_NETWORK_LASTCONNECT},
+									where, null, null, null, null);
+			if( cursor.getCount() == 1 )
+			{
+				cursor.moveToFirst();
+				NetworkConnectionInfo connectionInfo = getNetworkConnectionInfo(cursor);
+				cursor.close();
+				return connectionInfo;
+			}
+			else
+			{
+				IllegalStateException e = new IllegalStateException( "Expected 1 row to be returned but instead found number of rows to be: "
+						+ cursor.getCount() );
+				Log.e( LOG_TAG, e.getMessage(), e );
+				cursor.close();
+				throw e;
+			}
+		}
+		finally
+		{
+			db.close();
+		}
+	}
+
+	private NetworkConnectionInfo getNetworkConnectionInfo(Cursor cursor) {
+		NetworkConnectionInfo info = new NetworkConnectionInfo();
+		info.setNetworkName( cursor.getString(0) );
+		info.setXauth( cursor.getString(1) );
+		info.setPassword( cursor.getString(2) );
+		info.setIpSecGateway( cursor.getString(3) );
+		info.setIpSecId( cursor.getString(4) );
+		info.setIpSecSecret( cursor.getString(5) );
+		info.setLastConnect( cursor.getInt(6) );
+		return info;
 	}
 
 	/* id is the rowid of the network you want to delete
@@ -121,8 +179,15 @@ public class NetworkDatabase extends SQLiteOpenHelper {
  	 */
 	public long deleteNetwork(long id) {
 		Log.d(LOG_TAG, PREFIX + "Deleting network");
-		SQLiteDatabase db = this.getReadableDatabase();
-		return db.delete(TABLE_NETWORKS, KEY_ROWID + "=" + id, null);
+		SQLiteDatabase db = this.getWritableDatabase();
+		try
+		{
+			return db.delete(TABLE_NETWORKS, KEY_ROWID + "=" + id, null);
+		}
+		finally
+		{
+			db.close();
+		}
 	}
 
 }
