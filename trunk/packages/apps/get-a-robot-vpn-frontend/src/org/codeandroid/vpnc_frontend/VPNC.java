@@ -97,7 +97,6 @@ public class VPNC extends PreferenceActivity implements OnItemLongClickListener,
 		cursor.close();
 	}
 
-	@Override
 	public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id)
 	{
 		Log.i(TAG, "LONG PRESS Pos: " + pos + " ID: " + id );
