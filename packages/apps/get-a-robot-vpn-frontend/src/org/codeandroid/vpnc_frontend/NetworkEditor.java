@@ -229,26 +229,26 @@ public class NetworkEditor extends PreferenceActivity implements OnSharedPrefere
 
 	// @Override
   	public boolean onPreferenceClick  (Preference preference)  {
-			String nickname = GetSummary("nickname");
-			String IPSec_gateway = GetSummary("IPSec_gateway");
-			String IPSec_ID = GetSummary("IPSec_ID");
-			String IPSec_secret = GetSummary("IPSec_secret");
-			String Xauth = GetSummary("Xauth");
-			String password = GetSummary("password");
+  		NetworkConnectionInfo connectionInfo = new NetworkConnectionInfo();
+		connectionInfo.setNetworkName( GetSummary("nickname") );
+		connectionInfo.setIpSecGateway( GetSummary("IPSec_gateway") );
+		connectionInfo.setIpSecId( GetSummary("IPSec_ID") );
+		connectionInfo.setIpSecSecret( GetSummary("IPSec_secret") );
+		connectionInfo.setXauth( GetSummary("Xauth") );
+		connectionInfo.setPassword( GetSummary("password") );
 
-			if (_id == -1) {
-				db.createNetwork( nickname, IPSec_gateway, 
-							IPSec_ID, IPSec_secret, Xauth, password);
-			}
-			else {
-				db.updateNetwork( _id, nickname, IPSec_gateway, 
-							IPSec_ID, IPSec_secret, Xauth, password);
-			}
-			
-			setResult(RESULT_OK);
-  			finish();
-  			Log.d(LOG_TAG, PREFIX + "onPreferenceClick - End");
-			return true; 
+		if (_id == -1) {
+			db.createNetwork(connectionInfo);
+		}
+		else {
+			connectionInfo.setId(_id);
+			db.updateNetwork(connectionInfo);
+		}
+		
+		setResult(RESULT_OK);
+		finish();
+		Log.d(LOG_TAG, PREFIX + "onPreferenceClick - End");
+		return true; 
 	}
 
 }

@@ -30,6 +30,22 @@ public class NetworkPreference extends Preference implements OnPreferenceClickLi
 		Log.i(TAG, "Creating new NetworkPreference");
 	}
 
+	public NetworkPreference(Context context, AttributeSet attrs, NetworkConnectionInfo connectionInfo) {
+		this(context,attrs);
+		if( connectionInfo.getLastConnect() == Integer.MAX_VALUE )
+		{
+			this.setSummary(R.string.never_connected);
+		}
+		else
+		{
+			this.setSummary(R.string.never_connected); //later set actual timestamp
+		}
+
+		this.setTitle( connectionInfo.getNetworkName() );
+		this.setEnabled(true);
+		this._id = connectionInfo.getId();
+	}
+
 	public int getid() {
 		return _id;
 	}

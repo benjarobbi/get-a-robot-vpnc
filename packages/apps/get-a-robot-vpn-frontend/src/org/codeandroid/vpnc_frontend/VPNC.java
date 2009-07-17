@@ -1,5 +1,7 @@
 package org.codeandroid.vpnc_frontend;
 
+import java.util.List;
+
 import android.preference.PreferenceActivity; 
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -76,25 +78,13 @@ public class VPNC extends PreferenceActivity implements OnItemLongClickListener,
 		NetworkList.removeAll();
 
 		NetworkDatabase n = new NetworkDatabase(this);
-		Cursor cursor = n.allNetworks();
-
-		int idColumn = cursor.getColumnIndex("_id");
-		int nicknameColumn = cursor.getColumnIndex("nickname");
-
-		while (cursor.moveToNext() ){ 
-			String nickname = cursor.getString(nicknameColumn);
-			int _id = cursor.getInt(idColumn);
-
-			NetworkPreference pref = new NetworkPreference(this, null );
-			pref.setSummary(R.string.never_connected);
-			pref.setTitle(nickname);
-			pref.setEnabled(true);
-			Log.i(TAG, "Adding NetworkPreference with ID:" +  _id);
-			pref._id = _id;
+		List<NetworkConnectionInfo> connectionInfos = n.allNetworks();
+		for( NetworkConnectionInfo connectionInfo : connectionInfos )
+		{
+			NetworkPreference pref = new NetworkPreference(this, null, connectionInfo );
+			Log.i(TAG, "Adding NetworkPreference with ID:" +  connectionInfo.getId());
 			NetworkList.addPreference(pref);
 		}
-	
-		cursor.close();
 	}
 
 	public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id)
