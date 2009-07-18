@@ -6,8 +6,7 @@ import java.io.File;
 
 import android.os.Bundle;
 import android.util.Log;
-import java.io.File;
-import java.io.FileInputStream;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,10 +15,8 @@ import java.io.OutputStream;
 // This class manages the creation of files on the disk in the /data/data/ direcotry.
 public class BackendFileManager extends Activity {
 
-	// For logging
 	private final String LOG_TAG = "VPNC_filemanager";
 
-	// Can we get the version of the package somehow ?
 	private static double version = 0.01;
 	
 	// FIXME: make symlinks for the route/ifconfig to bb portably/sanely.
@@ -29,7 +26,6 @@ public class BackendFileManager extends Activity {
 										"bb",
 										"make-tun-device"};
 
-	// destination directory
 	private static String targetDirectory = "/data/data/org.codeandroid.vpnc_frontend/files/";
 	    
 	@Override
@@ -38,7 +34,6 @@ public class BackendFileManager extends Activity {
 		// setContentView(R.layout.main);
 		
 		try {
-			Log.i(LOG_TAG, "******* FILES LEN IS" + files.length);
 			
 			for (int i = 0; i < files.length; i++) {
 					copyFromAsset(files[i], new File(targetDirectory + files[i]));	
