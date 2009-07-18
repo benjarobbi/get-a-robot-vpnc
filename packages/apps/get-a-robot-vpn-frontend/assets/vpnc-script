@@ -40,7 +40,7 @@
 # 2) Parse dns packets going out via tunnel and redirect them to original dns-server
 
 env | sort
-set -x 
+# set -x 
 
 # =========== script (variable) setup ====================================
 
