@@ -7,9 +7,9 @@ import java.io.InputStreamReader;
 
 import android.util.Log;
 
-
 public class LoggingThread extends Thread
 {
+
 	private BufferedReader bufferedReader;
 	private String tag;
 	private boolean quit = false;
@@ -17,9 +17,9 @@ public class LoggingThread extends Thread
 	public LoggingThread(InputStream inputStream, String tag)
 	{
 		this.tag = tag;
-		bufferedReader = new BufferedReader( new InputStreamReader(inputStream) );
+		bufferedReader = new BufferedReader( new InputStreamReader( inputStream ) );
 	}
-	
+
 	@Override
 	public void run()
 	{
@@ -35,7 +35,7 @@ public class LoggingThread extends Thread
 			Log.w( tag, e );
 		}
 	}
-	
+
 	public void quit()
 	{
 		quit = true;

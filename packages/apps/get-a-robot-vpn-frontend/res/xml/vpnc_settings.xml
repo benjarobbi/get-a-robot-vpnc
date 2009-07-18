@@ -1,31 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<CheckBoxPreference
-	android:key="VPN" 
-	android:title="@string/vpn_title" 
-	android:summary="@string/vpn_summary" 
-	android:summaryOn="@string/vpn_summary_on"
-	android:summaryOff="@string/vpn_summary_off"
-	android:defaultValue="false" />
+	<CheckBoxPreference android:key="VPN" android:title="@string/vpn_title"
+		android:summary="@string/vpn_summary" android:summaryOn="@string/vpn_summary_on"
+		android:summaryOff="@string/vpn_summary_off" android:defaultValue="false" />
 
-	<CheckBoxPreference
-	android:key="NOTIFICATION" 
-	android:title="@string/notificaton_title" 
-	android:summary="@string/notification_summary" 
-	android:dependency="VPN"
-	android:defaultValue="false" />
+	<CheckBoxPreference android:key="NOTIFICATION"
+		android:title="@string/notificaton_title" android:summary="@string/notification_summary"
+		android:dependency="VPN" android:defaultValue="false" />
 
-    <org.codeandroid.vpnc_frontend.ProgressCategory
-            android:key="network_list"
-	    android:id="@+id/progress_category"
-            android:dependency="VPN"
-            android:title="@string/vpn_network_listing" 
-            android:persistent="false" />
+	<org.codeandroid.vpnc_frontend.ProgressCategory
+		android:key="network_list" android:id="@+id/progress_category"
+		android:dependency="VPN" android:title="@string/vpn_network_listing"
+		android:persistent="false" />
 
-        <PreferenceScreen
-		android:title="@string/vpn_add_another_network"
-		android:key="ADD_NETWORK"
-		android:summary="@string/vpn_add_another_network_summary"> 
+	<PreferenceScreen android:title="@string/vpn_add_another_network"
+		android:key="ADD_NETWORK" android:summary="@string/vpn_add_another_network_summary">
 	</PreferenceScreen>
 
 </PreferenceScreen>

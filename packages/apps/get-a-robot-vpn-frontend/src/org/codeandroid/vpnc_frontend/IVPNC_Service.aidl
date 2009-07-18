@@ -1,5 +1,4 @@
 // AIDL interface to the VPNC service that wraps around the native process
-
 package org.codeandroid.vpnc_frontend;
 
 import java.util.Map;
