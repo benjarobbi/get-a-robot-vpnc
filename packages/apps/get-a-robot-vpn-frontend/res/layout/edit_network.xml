@@ -136,11 +136,11 @@
 	    </LinearLayout>
 	
 	    <LinearLayout
-	    	android:id="@+android:id/editNetworkButtonLayout"
+	    	android:id="@+android:id/addNetworkButtonLayout"
 	        android:layout_width="fill_parent" android:layout_height="fill_parent"
 	        android:layout_gravity="bottom"
 	        android:orientation="horizontal">
-			<Button android:id="@+android:id/editNetworkSaveButton" 
+			<Button android:id="@+android:id/editNetworkAddButton" 
 					android:text="@string/add"
 					android:layout_weight="1"
 					android:layout_width="0dip"
@@ -148,6 +148,34 @@
 			        android:layout_gravity="bottom"
 			/>
 			<Button android:id="@+android:id/editNetworkCancelButton" 
+					android:text="@string/cancel"
+					android:layout_weight="1"
+					android:layout_width="0dip"
+					android:layout_height="wrap_content"
+			        android:layout_gravity="bottom"
+			/>
+		</LinearLayout>
+	
+	    <LinearLayout
+	    	android:id="@+android:id/editNetworkButtonLayout"
+	        android:layout_width="fill_parent" android:layout_height="fill_parent"
+	        android:layout_gravity="bottom"
+	        android:orientation="horizontal">
+			<Button android:id="@+android:id/editNetworkUpdateButton" 
+					android:text="@string/update"
+					android:layout_weight="1"
+					android:layout_width="0dip"
+					android:layout_height="wrap_content"
+			        android:layout_gravity="bottom"
+			/>
+			<Button android:id="@+android:id/editNetworkDeleteButton" 
+					android:text="@string/delete"
+					android:layout_weight="1"
+					android:layout_width="0dip"
+					android:layout_height="wrap_content"
+			        android:layout_gravity="bottom"
+			/>
+			<Button android:id="@+android:id/editNetworkCancelButton2" 
 					android:text="@string/cancel"
 					android:layout_weight="1"
 					android:layout_width="0dip"

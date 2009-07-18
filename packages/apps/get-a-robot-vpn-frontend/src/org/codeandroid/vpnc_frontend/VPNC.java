@@ -2,36 +2,27 @@ package org.codeandroid.vpnc_frontend;
 
 import java.util.List;
 
-import android.preference.PreferenceActivity; 
-import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
-import android.preference.PreferenceGroup;
-import android.content.Context;
-import android.widget.Button;
-
-import android.os.Bundle;
-import android.view.View;
-import android.util.Log; 
 import android.content.Intent;
-
-import android.widget.ListView;
 import android.database.Cursor;
-import android.widget.AdapterView;
-
-import org.codeandroid.vpnc_frontend.NetworkPreference;
-import org.codeandroid.vpnc_frontend.NetworkManager;
-import org.codeandroid.vpnc_frontend.ProgressCategory;
-import org.codeandroid.vpnc_frontend.NetworkDialog;
-import android.widget.AdapterView.OnItemLongClickListener;
+import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnCreateContextMenuListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
-public class VPNC extends PreferenceActivity implements OnItemLongClickListener,OnPreferenceClickListener {
+public class VPNC extends PreferenceActivity implements OnPreferenceClickListener {
 
 	private final String TAG = "VPNC";
 	private ProgressCategory NetworkList;
 	private CheckBoxPreference VPNEnabled;
-	private ListView lv; 
 
 	public NetworkDatabase ndb;
 	public Cursor networks;
@@ -63,13 +54,70 @@ public class VPNC extends PreferenceActivity implements OnItemLongClickListener,
 		Preference AddNew = (Preference) findPreference("ADD_NETWORK");
 		AddNew.setOnPreferenceClickListener(this);
 
-		lv = getListView();
-		lv.setOnItemLongClickListener (this);
-
+		getListView().setOnCreateContextMenuListener(createContextMenuListener);
 		ShowNetworks();
-
 	}
 
+    private OnCreateContextMenuListener createContextMenuListener = new OnCreateContextMenuListener()
+	{
+		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+		{
+			if( menuInfo instanceof AdapterContextMenuInfo )
+			{
+				AdapterContextMenuInfo adapterInfo = (AdapterContextMenuInfo)menuInfo;
+
+				switch( (int)adapterInfo.id )
+				{
+					case VPN_ENABLE:
+						Log.i( TAG, "long press handler skipping vpn checkbox" );
+						break;
+					case VPN_NOTIFICATIONS:
+						Log.i( TAG, "long press handler skipping notifications checkbox" );
+						break;
+
+					case ADD_NETWORK:
+						Log.i( TAG, "long press handler skipping add button" );
+						break;
+
+					default:
+						Log.i( TAG, "long press handler, handling the choice" );
+						menu.add( Menu.NONE, 0, 0, R.string.connect );
+						menu.add( Menu.NONE, 1, 1, R.string.disconnect );
+						menu.add( Menu.NONE, 2, 2, R.string.edit );
+				}
+			}
+		}
+	};
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item)
+	{
+		if( item.getMenuInfo() instanceof AdapterContextMenuInfo )
+		{
+			AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo)item.getMenuInfo();
+			NetworkPreference networkPreference = (NetworkPreference)NetworkList.getPreference( menuInfo.position - 3 );
+			
+			switch( item.getItemId() )
+			{
+				case 0:
+					System.out.println("connect to service");
+					break;
+
+				case 1:
+					System.out.println("disconnect from service");
+					break;
+
+				case 2:
+					Intent intent = new Intent( this, EditNetwork.class );
+					intent.putExtra( Intent.EXTRA_TITLE, networkPreference.getid() );
+					startActivityForResult( intent, SUB_ACTIVITY_REQUEST_CODE );
+					
+				default:
+					break;
+			}
+		}
+		return false;
+	}
 
 	/* I've been told that i should change this to use an adapter */ 
 	private void ShowNetworks() {
@@ -77,7 +125,7 @@ public class VPNC extends PreferenceActivity implements OnItemLongClickListener,
 		/* Remove all the networks, this is a full refresh */
 		NetworkList.removeAll();
 
-		NetworkDatabase n = new NetworkDatabase(this);
+		NetworkDatabase n = NetworkDatabase.getNetworkDatabase(this);
 		List<NetworkConnectionInfo> connectionInfos = n.allNetworks();
 		for( NetworkConnectionInfo connectionInfo : connectionInfos )
 		{
@@ -85,33 +133,6 @@ public class VPNC extends PreferenceActivity implements OnItemLongClickListener,
 			Log.i(TAG, "Adding NetworkPreference with ID:" +  connectionInfo.getId());
 			NetworkList.addPreference(pref);
 		}
-	}
-
-	public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id)
-	{
-		Log.i(TAG, "LONG PRESS Pos: " + pos + " ID: " + id );
-		Log.i(TAG, "Switching on: " + id ) ;
-
-		switch((int)id) {
-			case VPN_ENABLE:
-				Log.i(TAG, "long press handler skipping vpn checkbox");
-				break;
-			case VPN_NOTIFICATIONS:
-				Log.i(TAG, "long press handler skipping notifications checkbox");
-				break;
-			case ADD_NETWORK:
-				Log.i(TAG, "long press handler skipping add button");
-				break; 
-			default:
-				Log.i(TAG, "long press handler, handling the choice");
-				NetworkPreference p = (NetworkPreference)av.getItemAtPosition(pos);
-				NetworkDialog dialog = new NetworkDialog(this, p.getid());
-				dialog.show();	
-				return true;
-		}
-
-		// Should be handled by single clicks.
-		return false;
 	}
 
 	public boolean onPreferenceClick(Preference preference) {
