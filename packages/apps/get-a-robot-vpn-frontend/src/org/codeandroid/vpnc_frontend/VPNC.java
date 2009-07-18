@@ -53,6 +53,10 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.vpnc_settings);
 
+		// Copy files to their locations, we should perhaps do it on the first run, of this version.
+		Intent intent = new Intent( this, BackendFileManager.class );
+		startActivityForResult( intent, SUB_ACTIVITY_REQUEST_CODE );
+		
 		VPNEnabled = (CheckBoxPreference ) findPreference("VPN");
 		VPNEnabled.setOnPreferenceChangeListener( getVPNActivationListener() );
 
@@ -236,7 +240,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	private void connectToService()
 	{
 		System.out.println("Will connect to service");
-		//Call start service first so the service lifecycle isn't tied to this activity
+		// Call start service first so the service lifecycle isn't tied to this activity
 		startService(vpncIntent);
 		bindService( vpncIntent, serviceConnection, Context.BIND_AUTO_CREATE );
 	}
