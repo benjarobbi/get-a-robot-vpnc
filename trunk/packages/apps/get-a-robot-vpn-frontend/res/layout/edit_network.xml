@@ -9,181 +9,38 @@
 	    android:layout_width="fill_parent" android:layout_height="fill_parent"
 	    android:orientation="vertical">
 	
-	    <LinearLayout
-	    	android:id="@+android:id/nicknameLayout"
-	        android:layout_width="fill_parent" android:layout_height="wrap_content"
-	        android:layout_gravity="center_vertical" android:gravity="center_horizontal"
-	        android:orientation="horizontal">
-	        <TextView android:id="@+android:id/nicknameTextView"
-		    	android:layout_width="wrap_content" android:layout_height="wrap_content"
-	        	android:text="@string/title_nickname"
-	        	android:textSize="18sp"
-	        />
-		    <EditText android:id="@+android:id/nicknameEditText"
-		        android:layout_width="fill_parent" android:layout_height="wrap_content"
-		        android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-		        android:lines="1"
-		        android:autoText="true"
-		        android:capitalize="words"
-		        android:layout_weight="1"
-		        android:freezesText="true"
-	        />
-	    </LinearLayout>
+	    <TableLayout android:id="@+id/TableLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:stretchColumns="1"><TableRow android:id="@+id/TableRow01" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+android:id/nicknameTextView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_nickname" android:textSize="18sp" /><EditText android:id="@+android:id/nicknameEditText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:lines="1" android:autoText="true" android:capitalize="words" android:layout_weight="1" android:freezesText="true" /></TableRow>
+
+
+<TableRow android:id="@+id/TableRow03" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+android:id/IPSecGatewayTextView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_IPSec_gateway_preference" android:textSize="18sp" /><EditText android:id="@+android:id/IPSecGatewayEditText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:lines="1" android:autoText="true" android:capitalize="words" android:layout_weight="1" android:freezesText="true" />
+</TableRow><TableRow android:id="@+id/TableRow06" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+android:id/IPSecIDTextView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_IPSec_ID_preference" android:textSize="18sp" /><EditText android:id="@+android:id/IPSecIDEditText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:lines="1" android:autoText="true" android:capitalize="words" android:layout_weight="1" android:freezesText="true" />
+</TableRow><TableRow android:id="@+id/TableRow07" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+android:id/IPSecSecretTextView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_IPSec_secret_preference" android:textSize="18sp" /><EditText android:id="@+android:id/IPSecSecretEditText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:lines="1" android:autoText="true" android:capitalize="words" android:layout_weight="1" android:freezesText="true" />
+</TableRow><TableRow android:id="@+id/TableRow08" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+android:id/xauthTextView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_username_preference" android:textSize="18sp" /><EditText android:id="@+android:id/xauthEditText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:lines="1" android:autoText="true" android:capitalize="words" android:layout_weight="1" android:freezesText="true" />
+</TableRow><TableRow android:id="@+id/TableRow09" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+android:id/passwordTextView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_password_preference" android:textSize="18sp" /><EditText android:id="@+android:id/passwordEditText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="3dip" android:layout_marginRight="3dip" android:lines="1" android:autoText="true" android:capitalize="words" android:layout_weight="1" android:freezesText="true" /></TableRow></TableLayout>
 	
-	    <LinearLayout
-	    	android:id="@+android:id/IPSecGatewayLayout"
-	        android:layout_width="fill_parent" android:layout_height="wrap_content"
-	        android:layout_gravity="center_vertical" android:gravity="center_horizontal"
-	        android:orientation="horizontal">
-	        <TextView android:id="@+android:id/IPSecGatewayTextView"
-		    	android:layout_width="wrap_content" android:layout_height="wrap_content"
-	        	android:text="@string/title_IPSec_gateway_preference"
-	        	android:textSize="18sp"
-	        />
-		    <EditText android:id="@+android:id/IPSecGatewayEditText"
-		        android:layout_width="fill_parent" android:layout_height="wrap_content"
-		        android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-		        android:lines="1"
-		        android:autoText="true"
-		        android:capitalize="words"
-		        android:layout_weight="1"
-		        android:freezesText="true"
-	        />
-	    </LinearLayout>
+	    
 	
-	    <LinearLayout
-	    	android:id="@+android:id/IPSecIDLayout"
-	        android:layout_width="fill_parent" android:layout_height="wrap_content"
-	        android:layout_gravity="center_vertical" android:gravity="center_horizontal"
-	        android:orientation="horizontal">
-	        <TextView android:id="@+android:id/IPSecIDTextView"
-		    	android:layout_width="wrap_content" android:layout_height="wrap_content"
-	        	android:text="@string/title_IPSec_ID_preference"
-	        	android:textSize="18sp"
-	        />
-		    <EditText android:id="@+android:id/IPSecIDEditText"
-		        android:layout_width="fill_parent" android:layout_height="wrap_content"
-		        android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-		        android:lines="1"
-		        android:autoText="true"
-		        android:capitalize="words"
-		        android:layout_weight="1"
-		        android:freezesText="true"
-	        />
-	    </LinearLayout>
+	    
 	
-	    <LinearLayout
-	    	android:id="@+android:id/IPSecSecretLayout"
-	        android:layout_width="fill_parent" android:layout_height="wrap_content"
-	        android:layout_gravity="center_vertical" android:gravity="center_horizontal"
-	        android:orientation="horizontal">
-	        <TextView android:id="@+android:id/IPSecSecretTextView"
-		    	android:layout_width="wrap_content" android:layout_height="wrap_content"
-	        	android:text="@string/title_IPSec_secret_preference"
-	        	android:textSize="18sp"
-	        />
-		    <EditText android:id="@+android:id/IPSecSecretEditText"
-		        android:layout_width="fill_parent" android:layout_height="wrap_content"
-		        android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-		        android:lines="1"
-		        android:autoText="true"
-		        android:capitalize="words"
-		        android:layout_weight="1"
-		        android:freezesText="true"
-	        />
-	    </LinearLayout>
+	    
 	
-	    <LinearLayout
-	    	android:id="@+android:id/xauthLayout"
-	        android:layout_width="fill_parent" android:layout_height="wrap_content"
-	        android:layout_gravity="center_vertical" android:gravity="center_horizontal"
-	        android:orientation="horizontal">
-	        <TextView android:id="@+android:id/xauthTextView"
-		    	android:layout_width="wrap_content" android:layout_height="wrap_content"
-	        	android:text="@string/title_username_preference"
-	        	android:textSize="18sp"
-	        />
-		    <EditText android:id="@+android:id/xauthEditText"
-		        android:layout_width="fill_parent" android:layout_height="wrap_content"
-		        android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-		        android:lines="1"
-		        android:autoText="true"
-		        android:capitalize="words"
-		        android:layout_weight="1"
-		        android:freezesText="true"
-	        />
-	    </LinearLayout>
+	    
 	
-	    <LinearLayout
-	    	android:id="@+android:id/passwordLayout"
-	        android:layout_width="fill_parent" android:layout_height="wrap_content"
-	        android:layout_gravity="center_vertical" android:gravity="center_horizontal"
-	        android:orientation="horizontal">
-	        <TextView android:id="@+android:id/passwordTextView"
-		    	android:layout_width="wrap_content" android:layout_height="wrap_content"
-	        	android:text="@string/title_password_preference"
-	        	android:textSize="18sp"
-	        />
-		    <EditText android:id="@+android:id/passwordEditText"
-		        android:layout_width="fill_parent" android:layout_height="wrap_content"
-		        android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-		        android:lines="1"
-		        android:autoText="true"
-		        android:capitalize="words"
-		        android:layout_weight="1"
-		        android:freezesText="true"
-	        />
-	    </LinearLayout>
+	    
 	
-	    <LinearLayout
-	    	android:id="@+android:id/addNetworkButtonLayout"
-	        android:layout_width="fill_parent" android:layout_height="fill_parent"
-	        android:layout_gravity="bottom"
-	        android:orientation="horizontal">
-			<Button android:id="@+android:id/editNetworkAddButton" 
-					android:text="@string/add"
-					android:layout_weight="1"
-					android:layout_width="0dip"
-					android:layout_height="wrap_content"
-			        android:layout_gravity="bottom"
-			/>
-			<Button android:id="@+android:id/editNetworkCancelButton" 
-					android:text="@string/cancel"
-					android:layout_weight="1"
-					android:layout_width="0dip"
-					android:layout_height="wrap_content"
-			        android:layout_gravity="bottom"
-			/>
+	    
+	
+	    
+	
+	<LinearLayout android:id="@+android:id/addNetworkButtonLayout" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_gravity="bottom" android:orientation="horizontal">
+			<Button android:id="@+android:id/editNetworkAddButton" android:text="@string/add" android:layout_weight="1" android:layout_width="0dip" android:layout_height="wrap_content" android:layout_gravity="bottom" />
+			<Button android:id="@+android:id/editNetworkCancelButton" android:text="@string/cancel" android:layout_weight="1" android:layout_width="0dip" android:layout_height="wrap_content" android:layout_gravity="bottom" />
+		</LinearLayout><LinearLayout android:id="@+android:id/editNetworkButtonLayout" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_gravity="bottom" android:orientation="horizontal">
+			<Button android:id="@+android:id/editNetworkUpdateButton" android:text="@string/update" android:layout_weight="1" android:layout_width="0dip" android:layout_height="wrap_content" android:layout_gravity="bottom" />
+			<Button android:id="@+android:id/editNetworkDeleteButton" android:text="@string/delete" android:layout_weight="1" android:layout_width="0dip" android:layout_height="wrap_content" android:layout_gravity="bottom" />
+			<Button android:id="@+android:id/editNetworkCancelButton2" android:text="@string/cancel" android:layout_weight="1" android:layout_width="0dip" android:layout_height="wrap_content" android:layout_gravity="bottom" />
 		</LinearLayout>
-	
-	    <LinearLayout
-	    	android:id="@+android:id/editNetworkButtonLayout"
-	        android:layout_width="fill_parent" android:layout_height="fill_parent"
-	        android:layout_gravity="bottom"
-	        android:orientation="horizontal">
-			<Button android:id="@+android:id/editNetworkUpdateButton" 
-					android:text="@string/update"
-					android:layout_weight="1"
-					android:layout_width="0dip"
-					android:layout_height="wrap_content"
-			        android:layout_gravity="bottom"
-			/>
-			<Button android:id="@+android:id/editNetworkDeleteButton" 
-					android:text="@string/delete"
-					android:layout_weight="1"
-					android:layout_width="0dip"
-					android:layout_height="wrap_content"
-			        android:layout_gravity="bottom"
-			/>
-			<Button android:id="@+android:id/editNetworkCancelButton2" 
-					android:text="@string/cancel"
-					android:layout_weight="1"
-					android:layout_width="0dip"
-					android:layout_height="wrap_content"
-			        android:layout_gravity="bottom"
-			/>
-		</LinearLayout>
-	
-	</LinearLayout>
+
+</LinearLayout>
 
 </ScrollView>
