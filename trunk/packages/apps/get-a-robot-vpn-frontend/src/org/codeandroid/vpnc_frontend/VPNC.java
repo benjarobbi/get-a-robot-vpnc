@@ -23,14 +23,15 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
-public class VPNC extends PreferenceActivity implements OnPreferenceClickListener {
+public class VPNC extends PreferenceActivity implements OnPreferenceClickListener
+{
 
 	private final String TAG = "VPNC";
-	private ProgressCategory NetworkList;
-	private CheckBoxPreference VPNEnabled;
+	private ProgressCategory networkList;
+	private CheckBoxPreference vpnEnabled;
 
 	private ServiceConnection serviceConnection = getServiceConnection();
-	private Intent vpncIntent = new Intent(IVPNC_Service.class.getName());
+	private Intent vpncIntent = new Intent( IVPNC_Service.class.getName() );
 	private IVPNC_Service vpncService;
 	private int connectedVpnId = -1;
 
@@ -40,46 +41,44 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	private final int VPN_NOTIFICATIONS = 2;
 	private final int ADD_NETWORK = 4;
 
-	private final String VPN_ENABLE_KEY= "VPN";
-	private final String VPN_NOTIFICATIONS_KEY= "NOTIFICATION";
-	private final String ADD_NETWORK_KEY="ADD_NETWORK";
+	private final String VPN_ENABLE_KEY = "VPN";
+	private final String VPN_NOTIFICATIONS_KEY = "NOTIFICATION";
+	private final String ADD_NETWORK_KEY = "ADD_NETWORK";
 
-
-
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.vpnc_settings);
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate( savedInstanceState );
+		addPreferencesFromResource( R.xml.vpnc_settings );
 
 		// Copy files to their locations, we should perhaps do it on the first run, of this version.
 		Intent intent = new Intent( this, BackendFileManager.class );
 		startActivityForResult( intent, SUB_ACTIVITY_REQUEST_CODE );
-		
-		VPNEnabled = (CheckBoxPreference ) findPreference("VPN");
-		VPNEnabled.setOnPreferenceChangeListener( getVPNActivationListener() );
 
-		NetworkList = (ProgressCategory ) findPreference("network_list");
-		NetworkList.setOnPreferenceClickListener(this);
-		
-		Preference AddNew = (Preference) findPreference("ADD_NETWORK");
-		AddNew.setOnPreferenceClickListener(this);
+		vpnEnabled = (CheckBoxPreference)findPreference( "VPN" );
+		vpnEnabled.setOnPreferenceChangeListener( getVPNActivationListener() );
 
-		getListView().setOnCreateContextMenuListener(createContextMenuListener);
+		networkList = (ProgressCategory)findPreference( "network_list" );
+		networkList.setOnPreferenceClickListener( this );
+
+		Preference addNew = (Preference)findPreference( "ADD_NETWORK" );
+		addNew.setOnPreferenceClickListener( this );
+
+		getListView().setOnCreateContextMenuListener( createContextMenuListener );
 		ShowNetworks();
 	}
-	
+
 	@Override
 	protected void onStart()
 	{
 		super.onStart();
-		if( VPNEnabled.isChecked() && vpncService == null )
+		if( vpnEnabled.isChecked() && vpncService == null )
 		{
 			connectToService();
 		}
 	}
-	
+
 	@Override
 	protected void onStop()
 	{
@@ -90,8 +89,9 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		super.onStop();
 	}
 
-    private OnCreateContextMenuListener createContextMenuListener = new OnCreateContextMenuListener()
+	private OnCreateContextMenuListener createContextMenuListener = new OnCreateContextMenuListener()
 	{
+
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
 		{
 			if( menuInfo instanceof AdapterContextMenuInfo )
@@ -127,12 +127,12 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		if( item.getMenuInfo() instanceof AdapterContextMenuInfo )
 		{
 			AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo)item.getMenuInfo();
-			NetworkPreference networkPreference = (NetworkPreference)NetworkList.getPreference( menuInfo.position - 3 );
-			
+			NetworkPreference networkPreference = (NetworkPreference)networkList.getPreference( menuInfo.position - 3 );
+
 			switch( item.getItemId() )
 			{
 				case 0:
-					NetworkConnectionInfo info = NetworkDatabase.getNetworkDatabase(this).singleNetwork(networkPreference._id);
+					NetworkConnectionInfo info = NetworkDatabase.getNetworkDatabase( this ).singleNetwork( networkPreference._id );
 					try
 					{
 						vpncService.connect( info.getIpSecGateway(), info.getIpSecId(), info.getIpSecSecret(), info.getXauth(), info.getPassword() );
@@ -163,7 +163,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 					Intent intent = new Intent( this, EditNetwork.class );
 					intent.putExtra( Intent.EXTRA_TITLE, networkPreference.getid() );
 					startActivityForResult( intent, SUB_ACTIVITY_REQUEST_CODE );
-					
+
 				default:
 					break;
 			}
@@ -171,67 +171,74 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		return false;
 	}
 
-	/* I've been told that i should change this to use an adapter */ 
-	private void ShowNetworks() {
+	/* I've been told that i should change this to use an adapter */
+	private void ShowNetworks()
+	{
 
 		/* Remove all the networks, this is a full refresh */
-		NetworkList.removeAll();
+		networkList.removeAll();
 
-		NetworkDatabase n = NetworkDatabase.getNetworkDatabase(this);
+		NetworkDatabase n = NetworkDatabase.getNetworkDatabase( this );
 		List<NetworkConnectionInfo> connectionInfos = n.allNetworks();
 		for( NetworkConnectionInfo connectionInfo : connectionInfos )
 		{
-			NetworkPreference pref = new NetworkPreference(this, null, connectionInfo );
-			Log.i(TAG, "Adding NetworkPreference with ID:" +  connectionInfo.getId());
-			NetworkList.addPreference(pref);
+			NetworkPreference pref = new NetworkPreference( this, null, connectionInfo );
+			Log.i( TAG, "Adding NetworkPreference with ID:" + connectionInfo.getId() );
+			networkList.addPreference( pref );
 		}
 	}
 
-	public boolean onPreferenceClick(Preference preference) {
-		
+	public boolean onPreferenceClick(Preference preference)
+	{
+
 		String key = preference.getKey();
 
-		if (key.equals(VPN_ENABLE_KEY)) {
-				Log.i(TAG, "on preference click handling vpn checkbox");
+		if( key.equals( VPN_ENABLE_KEY ) )
+		{
+			Log.i( TAG, "on preference click handling vpn checkbox" );
 		}
-		else if (key.equals(VPN_NOTIFICATIONS_KEY)) {
-				Log.i(TAG, "on preference click handling notifications checkbox");
+		else if( key.equals( VPN_NOTIFICATIONS_KEY ) )
+		{
+			Log.i( TAG, "on preference click handling notifications checkbox" );
 		}
-		else if (key.equals(ADD_NETWORK_KEY)) {
-			Log.i(TAG, "on preference click handling add button");
-			Intent intent = new Intent(this, EditNetwork.class);
-			intent.putExtra(Intent.EXTRA_TITLE , -1 );
-	        startActivityForResult(intent, SUB_ACTIVITY_REQUEST_CODE);
-			Log.i(TAG, "ROAAAAAAAAAAAR!");
+		else if( key.equals( ADD_NETWORK_KEY ) )
+		{
+			Log.i( TAG, "on preference click handling add button" );
+			Intent intent = new Intent( this, EditNetwork.class );
+			intent.putExtra( Intent.EXTRA_TITLE, -1 );
+			startActivityForResult( intent, SUB_ACTIVITY_REQUEST_CODE );
+			Log.i( TAG, "ROAAAAAAAAAAAR!" );
 		}
-		else {
-				Log.i(TAG, "dont care about the other preferences");
+		else
+		{
+			Log.i( TAG, "dont care about the other preferences" );
 		}
-		
+
 		// We should only handle a few cases here, not everything.
 		return true;
-	}	
+	}
 
-
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		Log.i(TAG, "On Activity Result: resultcode" + resultCode);
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		super.onActivityResult( requestCode, resultCode, data );
+		Log.i( TAG, "On Activity Result: resultcode" + resultCode );
 		ShowNetworks();
 	}
-	
+
 	private ServiceConnection getServiceConnection()
 	{
 		return new ServiceConnection()
 		{
+
 			public void onServiceConnected(ComponentName name, IBinder service)
 			{
-				System.out.println("yay, connected!");
+				System.out.println( "yay, connected!" );
 				vpncService = IVPNC_Service.Stub.asInterface( service );
 			}
 
 			public void onServiceDisconnected(ComponentName name)
 			{
-				System.out.println("oops, disconnected!");
+				System.out.println( "oops, disconnected!" );
 				vpncService = null;
 			}
 		};
@@ -239,26 +246,27 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 	private void connectToService()
 	{
-		System.out.println("Will connect to service");
+		System.out.println( "Will connect to service" );
 		// Call start service first so the service lifecycle isn't tied to this activity
-		startService(vpncIntent);
+		startService( vpncIntent );
 		bindService( vpncIntent, serviceConnection, Context.BIND_AUTO_CREATE );
 	}
 
 	private void disconnectFromService()
 	{
-		System.out.println("Will disconnect service");
-		unbindService(serviceConnection);
-		stopService(vpncIntent);
+		System.out.println( "Will disconnect service" );
+		unbindService( serviceConnection );
+		stopService( vpncIntent );
 	}
 
 	private OnPreferenceChangeListener getVPNActivationListener()
 	{
 		return new OnPreferenceChangeListener()
 		{
+
 			public boolean onPreferenceChange(Preference preference, Object newValue)
 			{
-				if( Boolean.TRUE.equals(newValue) )
+				if( Boolean.TRUE.equals( newValue ) )
 				{
 					connectToService();
 				}

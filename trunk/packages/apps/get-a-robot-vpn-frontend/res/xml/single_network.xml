@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-android:id="@+id/why"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:orientation="vertical"
-android:gravity="right"
-xmlns:android="http://schemas.android.com/apk/res/android"
->
-<EditTextPreference
-                android:key="sample_network"
-		android:id="@+id/template_net"
-                android:title=""
-                android:summary="Last Connection:" />
+<LinearLayout android:id="@+id/why" android:layout_width="fill_parent"
+	android:layout_height="wrap_content" android:orientation="vertical"
+	android:gravity="right" xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference android:key="sample_network"
+		android:id="@+id/template_net" android:title="" android:summary="Last Connection:" />
 
 </LinearLayout>

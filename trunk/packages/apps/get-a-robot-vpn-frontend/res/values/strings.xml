@@ -1,52 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">VPN Settings</string>
-<string name="vpn_title">VPN</string>
-<string name="vpn_summary"></string>
-<string name="vpn_summary_on">Enabled</string>
-<string name="vpn_summary_off">Disabled</string>
-<string name="notificaton_title">Network Notifications</string>
-<string name="notification_summary">Notifiy me when the network is disconnected</string>
-<string name="vpn_add_another_network">Add Another Network</string> 
-<string name="vpn_add_another_network_summary">Configure a connectiont to a VPN network</string> 
-<string name="vpn_network_listing">VPN Networks</string> 
-<string name="add_network">Add VPN Network</string> 
-<string name="manage_network">Manage VPN Network</string> 
-<string name="edit_network">Edit VPN Network</string> 
-<string name="title_nickname"> Connection Name </string>
-<string name="dialog_title_nickname_preference"> Name which refers to network </string> 
-<string name="vpn_group_preferences"> IPSec Group Settings </string>
-<string name="title_IPSec_gateway_preference">IPSec gateway address </string>
-<string name="summary_IPSec_gateway_preference">  </string>
-<string name="dialog_title_IPSec_gateway_preference"> Enter DNS or IP of IPSec gateway </string>
-<string name="title_IPSec_ID_preference"> IPSec ID </string>
-<string name="summary_IPSec_ID_preference"> </string>
-<string name="dialog_title_IPSec_ID_preference"> Enter your IPSec group ID  </string>
-<string name="title_IPSec_secret_preference"> IPSec Secret </string>
-<string name="summary_IPSec_secret_preference">  </string>
-<string name="dialog_title_IPSec_secret_preference"> Enter the Group Secret</string>
-<string name="vpn_personal_preferences"> IPSec Personal Settings </string> 
-<string name="title_username_preference">Username</string>
-<string name="summary_username_preference"> </string>
-<string name="dialog_title_username_preference">Xauth Username</string>
-<string name="title_password_preference">Password</string>
-<string name="summary_password_preference"> </string>
-<string name="dialog_title_password_preference">Your password</string>
-<string name="progress_scanning">Loading..</string>
-<string name="never_connected">Never Connected</string>
-<string name="please_type_password">Enter your password</string>
-<string name="vpn_show_password">Show Password</string>
-<string name="please_type_secret">Enter group secret</string>
-<string name="save_settings">Save Settings</string>
+	<string name="app_name">VPN Settings</string>
+	<string name="vpn_title">VPN</string>
+	<string name="vpn_summary"></string>
+	<string name="vpn_summary_on">Enabled</string>
+	<string name="vpn_summary_off">Disabled</string>
+	<string name="notificaton_title">Network Notifications</string>
+	<string name="notification_summary">Notifiy me when the network is disconnected
+	</string>
+	<string name="vpn_add_another_network">Add Another Network</string>
+	<string name="vpn_add_another_network_summary">Configure a connectiont to a VPN network
+	</string>
+	<string name="vpn_network_listing">VPN Networks</string>
+	<string name="add_network">Add VPN Network</string>
+	<string name="manage_network">Manage VPN Network</string>
+	<string name="edit_network">Edit VPN Network</string>
+	<string name="title_nickname"> Connection Name </string>
+	<string name="dialog_title_nickname_preference"> Name which refers to network </string>
+	<string name="vpn_group_preferences"> IPSec Group Settings </string>
+	<string name="title_IPSec_gateway_preference">IPSec gateway address </string>
+	<string name="summary_IPSec_gateway_preference">
+	</string>
+	<string name="dialog_title_IPSec_gateway_preference"> Enter DNS or IP of IPSec gateway </string>
+	<string name="title_IPSec_ID_preference"> IPSec ID </string>
+	<string name="summary_IPSec_ID_preference">
+	</string>
+	<string name="dialog_title_IPSec_ID_preference"> Enter your IPSec group ID  </string>
+	<string name="title_IPSec_secret_preference"> IPSec Secret </string>
+	<string name="summary_IPSec_secret_preference">
+	</string>
+	<string name="dialog_title_IPSec_secret_preference"> Enter the Group Secret</string>
+	<string name="vpn_personal_preferences"> IPSec Personal Settings </string>
+	<string name="title_username_preference">Username</string>
+	<string name="summary_username_preference">
+	</string>
+	<string name="dialog_title_username_preference">Xauth Username</string>
+	<string name="title_password_preference">Password</string>
+	<string name="summary_password_preference">
+	</string>
+	<string name="dialog_title_password_preference">Your password</string>
+	<string name="progress_scanning">Loading..</string>
+	<string name="never_connected">Never Connected</string>
+	<string name="please_type_password">Enter your password</string>
+	<string name="vpn_show_password">Show Password</string>
+	<string name="please_type_secret">Enter group secret</string>
+	<string name="save_settings">Save Settings</string>
 
-<string name="connect">Connect</string>
-<string name="disconnect">Disconnect</string>
-<string name="edit">Configure</string>
-<string name="cancel">Cancel</string>
-<string name="add">Add</string>
-<string name="update">Update</string>
-<string name="delete">Delete</string>
-<string name="ok">OK</string>
-<string name="confirmation_message">Are you sure?</string>
-<string name="backend_file_manager">doesthismatter</string>
+	<string name="connect">Connect</string>
+	<string name="disconnect">Disconnect</string>
+	<string name="edit">Configure</string>
+	<string name="cancel">Cancel</string>
+	<string name="add">Add</string>
+	<string name="update">Update</string>
+	<string name="delete">Delete</string>
+	<string name="ok">OK</string>
+	<string name="confirmation_message">Are you sure?</string>
+	<string name="backend_file_manager">doesthismatter</string>
 </resources>

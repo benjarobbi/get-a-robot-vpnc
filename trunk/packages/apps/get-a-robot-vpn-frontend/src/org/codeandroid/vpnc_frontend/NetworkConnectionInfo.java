@@ -1,4 +1,3 @@
-
 package org.codeandroid.vpnc_frontend;
 
 public class NetworkConnectionInfo

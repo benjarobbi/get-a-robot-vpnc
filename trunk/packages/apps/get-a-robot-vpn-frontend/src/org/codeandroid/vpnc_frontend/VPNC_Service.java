@@ -10,14 +10,14 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-
 public class VPNC_Service extends Service
 {
+
 	private IVPNC_Service.Stub service = getService();
 	private Process process;
 	private LoggingThread stdoutLogging;
 	private LoggingThread stderrLogging;
-	
+
 	@Override
 	public IBinder onBind(Intent intent)
 	{
@@ -36,30 +36,31 @@ public class VPNC_Service extends Service
 	public void onCreate()
 	{
 		super.onCreate();
-		System.out.println("Service created");
+		System.out.println( "Service created" );
 		try
 		{
 			process = Runtime.getRuntime().exec( "/system/bin/su" );
 		}
 		catch( IOException e )
 		{
-			throw new RuntimeException(e);
+			throw new RuntimeException( e );
 		}
 	}
-	
+
 	@Override
 	public void onDestroy()
 	{
-		System.out.println("Service destroyed");
+		System.out.println( "Service destroyed" );
 		process.destroy();
 		process = null;
 		super.onDestroy();
 	}
-	
+
 	private IVPNC_Service.Stub getService()
 	{
 		return new IVPNC_Service.Stub()
 		{
+
 			public boolean connect(String gateway, String id, String secret, String xauth, String password) throws RemoteException
 			{
 				Log.w( "vpnc service", "Got called" );
@@ -74,26 +75,26 @@ public class VPNC_Service extends Service
 					}
 					if( is.available() > 0 )
 					{
-						Log.d( "vpn service", readString(is) );
+						Log.d( "vpn service", readString( is ) );
 					}
 					os.write( "/data/data/org.codeandroid.vpnc/vpnc --script /data/data/org.codeandroid.vpnc/vpnc-script --no-detach\n".getBytes() );
-					
-					Log.d( "vpn service", readString(is) );
+
+					Log.d( "vpn service", readString( is ) );
 					Log.w( "vpnc service", "IP " + gateway );
 					writeLine( os, gateway );
-					Log.d( "vpn service", readString(is) );
-					Log.w( "vpnc service", "group id: " + id);
+					Log.d( "vpn service", readString( is ) );
+					Log.w( "vpnc service", "group id: " + id );
 					writeLine( os, id );
-					Log.d( "vpn service", readString(is) );
+					Log.d( "vpn service", readString( is ) );
 					Log.w( "vpnc service", "group pwd " + secret );
 					writeLine( os, secret );
-					Log.d( "vpn service", readString(is) );
+					Log.d( "vpn service", readString( is ) );
 					Log.w( "vpnc service", "user " + xauth );
 					writeLine( os, xauth );
-					Log.d( "vpn service", readString(is) );
-					Log.w( "vpnc service", "password " + String.valueOf(maskedPassword) );
+					Log.d( "vpn service", readString( is ) );
+					Log.w( "vpnc service", "password " + String.valueOf( maskedPassword ) );
 					writeLine( os, password );
-					Log.d( "vpn service", readString(is) );
+					Log.d( "vpn service", readString( is ) );
 					Log.w( "vpnc service", "done with vpnc" );
 					stdoutLogging = new LoggingThread( is, "process stdout" );
 					stdoutLogging.start();
@@ -106,10 +107,10 @@ public class VPNC_Service extends Service
 				}
 				return true;
 			}
-			
+
 			public boolean disconnect() throws RemoteException
 			{
-				Log.w( "vpnc service", "Got called with disconnect");
+				Log.w( "vpnc service", "Got called with disconnect" );
 				stdoutLogging.quit();
 				stderrLogging.quit();
 				process.destroy();
@@ -125,7 +126,7 @@ public class VPNC_Service extends Service
 		byte[] characters = new byte[available + 1];
 		characters[0] = firstByte;
 		is.read( characters, 1, available );
-		return new String(characters);
+		return new String( characters );
 	}
 
 	private static void writeLine(OutputStream os, String value) throws IOException

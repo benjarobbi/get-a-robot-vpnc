@@ -1,53 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PreferenceScreen
-xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <EditTextPreference
-                android:key="nickname"
-                android:title="@string/title_nickname"
-                android:dialogTitle="@string/dialog_title_nickname_preference" />
+	<EditTextPreference android:key="nickname"
+		android:title="@string/title_nickname" android:dialogTitle="@string/dialog_title_nickname_preference" />
 
-	<PreferenceCategory
-            android:title="@string/vpn_group_preferences">
+	<PreferenceCategory android:title="@string/vpn_group_preferences">
 
-        <EditTextPreference
-                android:key="IPSec_gateway"
-                android:title="@string/title_IPSec_gateway_preference"
-                android:summary="@string/summary_IPSec_gateway_preference"
-                android:dialogTitle="@string/dialog_title_IPSec_gateway_preference" />
+		<EditTextPreference android:key="IPSec_gateway"
+			android:title="@string/title_IPSec_gateway_preference"
+			android:summary="@string/summary_IPSec_gateway_preference"
+			android:dialogTitle="@string/dialog_title_IPSec_gateway_preference" />
 
-        <EditTextPreference
-                android:key="IPSec_ID"
-                android:title="@string/title_IPSec_ID_preference"
-                android:summary="@string/summary_IPSec_ID_preference"
-                android:dialogTitle="@string/dialog_title_IPSec_ID_preference" />
+		<EditTextPreference android:key="IPSec_ID"
+			android:title="@string/title_IPSec_ID_preference" android:summary="@string/summary_IPSec_ID_preference"
+			android:dialogTitle="@string/dialog_title_IPSec_ID_preference" />
 
-        <EditTextPreference
-                android:key="IPSec_secret"
-                android:title="@string/title_IPSec_secret_preference"
-                android:summary="@string/summary_IPSec_secret_preference"
-                android:dialogTitle="@string/dialog_title_IPSec_secret_preference" />
+		<EditTextPreference android:key="IPSec_secret"
+			android:title="@string/title_IPSec_secret_preference"
+			android:summary="@string/summary_IPSec_secret_preference"
+			android:dialogTitle="@string/dialog_title_IPSec_secret_preference" />
 
 	</PreferenceCategory>
 
-	<PreferenceCategory
-            android:title="@string/vpn_personal_preferences">
+	<PreferenceCategory android:title="@string/vpn_personal_preferences">
 
-        <EditTextPreference
-                android:key="Xauth"
-                android:title="@string/title_username_preference"
-                android:summary="@string/summary_username_preference"
-                android:dialogTitle="@string/dialog_title_username_preference" />
+		<EditTextPreference android:key="Xauth"
+			android:title="@string/title_username_preference" android:summary="@string/summary_username_preference"
+			android:dialogTitle="@string/dialog_title_username_preference" />
 
-        <EditTextPreference
-                android:key="password"
-                android:title="@string/title_password_preference"
-                android:summary="@string/summary_password_preference"
-                android:dialogTitle="@string/dialog_title_password_preference" />
+		<EditTextPreference android:key="password"
+			android:title="@string/title_password_preference" android:summary="@string/summary_password_preference"
+			android:dialogTitle="@string/dialog_title_password_preference" />
 	</PreferenceCategory>
-	<Preference
-		android:key="save"
-		android:title="@string/save_settings"> 
+	<Preference android:key="save" android:title="@string/save_settings">
 	</Preference>
 
 </PreferenceScreen>
