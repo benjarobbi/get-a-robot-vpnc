@@ -16,8 +16,7 @@ public class NetworkList extends ListActivity {
 
 	private void showNetworks(Cursor cursor) {
 
-		SimpleCursorAdapter adapter = new SimpleCursorAdapter( this,
-		R.layout.item, cursor, FROM, TO);
+		SimpleCursorAdapter adapter = new SimpleCursorAdapter( this,R.layout.item, cursor, FROM, TO);
 		setListAdapter(adapter); 
 	} 
 
