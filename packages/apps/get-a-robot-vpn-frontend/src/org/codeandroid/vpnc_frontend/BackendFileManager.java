@@ -48,6 +48,8 @@ public class BackendFileManager extends Activity {
 		catch (Throwable t) {
 			Log.e(LOG_TAG , "Exception copying asset", t);
 		}
+		
+		finish(); 
 	}
 	
 	void copyFromAsset(String srcName, File dst)
