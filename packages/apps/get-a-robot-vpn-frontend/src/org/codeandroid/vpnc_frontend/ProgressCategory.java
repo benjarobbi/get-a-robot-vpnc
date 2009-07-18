@@ -21,8 +21,6 @@ import android.preference.PreferenceCategory;
 import android.util.AttributeSet;
 import android.view.View;
 
-import java.util.Map;
-
 public class ProgressCategory extends PreferenceCategory {
 
     private boolean mProgress = false;
