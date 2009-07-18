@@ -126,9 +126,9 @@ public class VPNC extends PreferenceActivity implements OnItemLongClickListener,
 		}
 		else if (key.equals(ADD_NETWORK_KEY)) {
 			Log.i(TAG, "on preference click handling add button");
-			Intent intent = new Intent(this, NetworkEditor.class);
+			Intent intent = new Intent(this, EditNetwork.class);
 			intent.putExtra(Intent.EXTRA_TITLE , -1 );
-	                startActivityForResult(intent, SUB_ACTIVITY_REQUEST_CODE);
+	        startActivityForResult(intent, SUB_ACTIVITY_REQUEST_CODE);
 			Log.i(TAG, "ROAAAAAAAAAAAR!");
 		}
 		else {
