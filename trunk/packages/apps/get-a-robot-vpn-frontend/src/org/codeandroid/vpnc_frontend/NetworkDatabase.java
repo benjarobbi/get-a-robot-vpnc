@@ -164,13 +164,14 @@ public class NetworkDatabase extends SQLiteOpenHelper {
 
 	private NetworkConnectionInfo getNetworkConnectionInfo(Cursor cursor) {
 		NetworkConnectionInfo info = new NetworkConnectionInfo();
-		info.setNetworkName( cursor.getString(0) );
-		info.setXauth( cursor.getString(1) );
-		info.setPassword( cursor.getString(2) );
-		info.setIpSecGateway( cursor.getString(3) );
-		info.setIpSecId( cursor.getString(4) );
-		info.setIpSecSecret( cursor.getString(5) );
-		info.setLastConnect( cursor.getInt(6) );
+		info.setId( cursor.getInt(0) );
+		info.setNetworkName( cursor.getString(1) );
+		info.setXauth( cursor.getString(2) );
+		info.setPassword( cursor.getString(3) );
+		info.setIpSecGateway( cursor.getString(4) );
+		info.setIpSecId( cursor.getString(5) );
+		info.setIpSecSecret( cursor.getString(6) );
+		info.setLastConnect( cursor.getInt(7) );
 		return info;
 	}
 
