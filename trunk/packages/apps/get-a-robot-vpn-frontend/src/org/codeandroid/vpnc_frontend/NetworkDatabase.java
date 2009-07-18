@@ -31,9 +31,19 @@ public class NetworkDatabase extends SQLiteOpenHelper {
 	
 	public static final String LOG_TAG = "VPNC";
 	private static final String PREFIX = NetworkDatabase.class.getSimpleName() + ":";
+	private static NetworkDatabase networkDatabase;
 	
-	public NetworkDatabase(Context context) {
+	private NetworkDatabase(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
+	}
+	
+	public static NetworkDatabase getNetworkDatabase(Context context)
+	{
+		if( networkDatabase == null )
+		{
+			networkDatabase = new NetworkDatabase(context);
+		}
+		return networkDatabase;
 	}
 
 	@Override
