@@ -83,7 +83,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 			values.put( FIELD_NETWORK_SECRET, connectionInfo.getIpSecSecret() );
 			values.put( FIELD_NETWORK_USERNAME, connectionInfo.getXauth() );
 			values.put( FIELD_NETWORK_PASSWORD, connectionInfo.getPassword() );
-			values.put( FIELD_NETWORK_LASTCONNECT, Integer.MAX_VALUE );
+			values.put( FIELD_NETWORK_LASTCONNECT, Long.MAX_VALUE );
 			return db.insert( TABLE_NETWORKS, null, values );
 		}
 		finally
@@ -106,7 +106,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 			values.put( FIELD_NETWORK_SECRET, connectionInfo.getIpSecSecret() );
 			values.put( FIELD_NETWORK_USERNAME, connectionInfo.getXauth() );
 			values.put( FIELD_NETWORK_PASSWORD, connectionInfo.getPassword() );
-			values.put( FIELD_NETWORK_LASTCONNECT, Integer.MAX_VALUE );
+			values.put( FIELD_NETWORK_LASTCONNECT, connectionInfo.getLastConnect() );
 			return db.update( TABLE_NETWORKS, values, KEY_ROWID + "=" + connectionInfo.getId(), null );
 		}
 		finally
@@ -180,14 +180,14 @@ public class NetworkDatabase extends SQLiteOpenHelper
 	private NetworkConnectionInfo getNetworkConnectionInfo(Cursor cursor)
 	{
 		NetworkConnectionInfo info = new NetworkConnectionInfo();
-		info.setId( cursor.getInt( 0 ) );
-		info.setNetworkName( cursor.getString( 1 ) );
-		info.setXauth( cursor.getString( 2 ) );
-		info.setPassword( cursor.getString( 3 ) );
-		info.setIpSecGateway( cursor.getString( 4 ) );
-		info.setIpSecId( cursor.getString( 5 ) );
-		info.setIpSecSecret( cursor.getString( 6 ) );
-		info.setLastConnect( cursor.getInt( 7 ) );
+		info.setId( cursor.getInt(0) );
+		info.setNetworkName( cursor.getString(1) );
+		info.setXauth( cursor.getString(2) );
+		info.setPassword( cursor.getString(3) );
+		info.setIpSecGateway( cursor.getString(4) );
+		info.setIpSecId( cursor.getString(5) );
+		info.setIpSecSecret( cursor.getString(6) );
+		info.setLastConnect( cursor.getLong(7) );
 		return info;
 	}
 

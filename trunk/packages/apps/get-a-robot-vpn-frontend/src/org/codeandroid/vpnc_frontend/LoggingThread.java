@@ -13,11 +13,13 @@ public class LoggingThread extends Thread
 	private BufferedReader bufferedReader;
 	private String tag;
 	private boolean quit = false;
+	private int priority;
 
-	public LoggingThread(InputStream inputStream, String tag)
+	public LoggingThread(InputStream inputStream, String tag, int priority)
 	{
 		this.tag = tag;
 		bufferedReader = new BufferedReader( new InputStreamReader( inputStream ) );
+		this.priority = priority;
 	}
 
 	@Override
@@ -27,12 +29,12 @@ public class LoggingThread extends Thread
 		{
 			for( String line = bufferedReader.readLine(); line != null && !quit; line = bufferedReader.readLine() )
 			{
-				Log.d( tag, line );
+				Log.println( priority, tag, line );
 			}
 		}
 		catch( IOException e )
 		{
-			Log.w( tag, e );
+			Log.e( tag, e.getMessage(), e );
 		}
 	}
 

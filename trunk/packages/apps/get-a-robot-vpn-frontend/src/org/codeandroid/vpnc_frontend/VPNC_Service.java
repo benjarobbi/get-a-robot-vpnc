@@ -1,5 +1,6 @@
 package org.codeandroid.vpnc_frontend;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,17 +14,20 @@ import android.util.Log;
 public class VPNC_Service extends Service
 {
 
+	private static final String TAG = "vpnc service";
+	
 	private IVPNC_Service.Stub service = getService();
 	private Process process;
 	private LoggingThread stdoutLogging;
 	private LoggingThread stderrLogging;
+	private int vpncProcessId;
 
 	@Override
 	public IBinder onBind(Intent intent)
 	{
 		if( IVPNC_Service.class.getName().equals( intent.getAction() ) )
 		{
-			Log.i( "vpnc service", "Service created and returned" );
+			Log.i( TAG, "Service created and returned" );
 			return service;
 		}
 		else
@@ -39,7 +43,7 @@ public class VPNC_Service extends Service
 		System.out.println( "Service created" );
 		try
 		{
-			process = Runtime.getRuntime().exec( "/system/bin/su" );
+			process = Runtime.getRuntime().exec("su");
 		}
 		catch( IOException e )
 		{
@@ -63,9 +67,14 @@ public class VPNC_Service extends Service
 
 			public boolean connect(String gateway, String id, String secret, String xauth, String password) throws RemoteException
 			{
-				Log.w( "vpnc service", "Got called" );
+				Log.d( TAG, "Got called" );
 				try
 				{
+					if( !new File("/dev/net/tun").exists() )
+					{
+						Log.d( TAG, "tun does not exist" );
+						return false;
+					}
 					OutputStream os = process.getOutputStream();
 					InputStream is = process.getInputStream();
 					char[] maskedPassword = password.toCharArray();
@@ -75,48 +84,102 @@ public class VPNC_Service extends Service
 					}
 					if( is.available() > 0 )
 					{
-						Log.d( "vpn service", readString( is ) );
+						Log.d( TAG, readString( is ) );
 					}
-					os.write( "/data/data/org.codeandroid.vpnc/vpnc --script /data/data/org.codeandroid.vpnc/vpnc-script --no-detach\n".getBytes() );
+					writeLine( os, "/data/data/org.codeandroid.vpnc/vpnc --script /data/data/org.codeandroid.vpnc/vpnc-script --no-detach" );
 
-					Log.d( "vpn service", readString( is ) );
-					Log.w( "vpnc service", "IP " + gateway );
+					Log.d( TAG, readString( is ) );
+					Log.d( TAG, "IP " + gateway );
 					writeLine( os, gateway );
-					Log.d( "vpn service", readString( is ) );
-					Log.w( "vpnc service", "group id: " + id );
+					Log.d( TAG, readString( is ) );
+					Log.d( TAG, "group id: " + id );
 					writeLine( os, id );
-					Log.d( "vpn service", readString( is ) );
-					Log.w( "vpnc service", "group pwd " + secret );
+					Log.d( TAG, readString( is ) );
+					Log.d( TAG, "group pwd " + secret );
 					writeLine( os, secret );
-					Log.d( "vpn service", readString( is ) );
-					Log.w( "vpnc service", "user " + xauth );
+					Log.d( TAG, readString( is ) );
+					Log.d( TAG, "user " + xauth );
 					writeLine( os, xauth );
-					Log.d( "vpn service", readString( is ) );
-					Log.w( "vpnc service", "password " + String.valueOf( maskedPassword ) );
+					Log.d( TAG, readString( is ) );
+					Log.d( TAG, "password " + String.valueOf( maskedPassword ) );
 					writeLine( os, password );
-					Log.d( "vpn service", readString( is ) );
-					Log.w( "vpnc service", "done with vpnc" );
-					stdoutLogging = new LoggingThread( is, "process stdout" );
+					Log.d( TAG, readString( is ) );
+					Log.d( TAG, "done with vpnc" );
+					stdoutLogging = new LoggingThread( is, "process stdout", Log.DEBUG );
 					stdoutLogging.start();
-					stderrLogging = new LoggingThread( process.getErrorStream(), "process stderr" );
+					stderrLogging = new LoggingThread( process.getErrorStream(), "process stderr", Log.ERROR );
 					stderrLogging.start();
+					getProcessId();
+					if( vpncProcessId > 0 )
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
 				}
 				catch( IOException e )
 				{
 					e.printStackTrace();
+					return false;
 				}
-				return true;
 			}
 
 			public boolean disconnect() throws RemoteException
 			{
-				Log.w( "vpnc service", "Got called with disconnect" );
+				Log.d( TAG, "Got called with disconnect" );
+				if( vpncProcessId > 0 )
+				{
+					Log.d( TAG, "will kill process " + vpncProcessId );
+					try
+					{
+						Process killProcess = Runtime.getRuntime().exec("su");
+						OutputStream os = killProcess.getOutputStream();
+						writeLine( os, "kill -9 " + vpncProcessId );
+						writeLine( os, "exit" );
+						readString( killProcess.getInputStream() );
+						readString( killProcess.getErrorStream() );
+						killProcess.destroy();
+						Log.d( TAG, "process killed" );
+					}
+					catch( IOException e )
+					{
+						Log.e( TAG, e.getMessage(), e );
+					}
+				}
 				stdoutLogging.quit();
 				stderrLogging.quit();
 				process.destroy();
 				return true;
 			}
 		};
+	}
+	
+	private void getProcessId() throws IOException
+	{
+		Process psProcess = Runtime.getRuntime().exec( "sh" );
+		OutputStream os = psProcess.getOutputStream();
+		InputStream is = psProcess.getInputStream();
+		writeLine( os, "ps | grep 'vpnc$' | cut -c 10-13" );
+		String pidString = readString(is).trim();
+		if( pidString == null || pidString.length() == 0 )
+		{
+			vpncProcessId = -1;
+		}
+		else
+		{
+			try
+			{
+				vpncProcessId = Integer.parseInt(pidString);
+				Log.d( TAG, "Got the pid for vpnc: " + vpncProcessId );
+			}
+			catch( NumberFormatException e )
+			{
+				Log.w( TAG, "Could not parse process id of " + pidString, e );
+				vpncProcessId = 0;
+			}
+		}
 	}
 
 	private static String readString(InputStream is) throws IOException
