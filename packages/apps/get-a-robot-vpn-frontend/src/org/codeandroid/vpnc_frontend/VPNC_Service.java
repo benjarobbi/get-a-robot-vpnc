@@ -70,7 +70,7 @@ public class VPNC_Service extends Service
 				Log.d( TAG, "Got called" );
 				try
 				{
-					if( !new File("/dev/net/tun").exists() )
+					if( ! new File("/dev/net/tun").exists() )
 					{
 						Log.d( TAG, "tun does not exist" );
 						return false;
@@ -86,7 +86,7 @@ public class VPNC_Service extends Service
 					{
 						Log.d( TAG, readString( is ) );
 					}
-					writeLine( os, "/data/data/org.codeandroid.vpnc/vpnc --script /data/data/org.codeandroid.vpnc/vpnc-script --no-detach" );
+					writeLine( os, "/data/data/org.codeandroid.vpnc_frontend/vpnc --script /data/data/org.codeandroid.vpnc_frontend/vpnc-script --no-detach" );
 
 					Log.d( TAG, readString( is ) );
 					Log.d( TAG, "IP " + gateway );
