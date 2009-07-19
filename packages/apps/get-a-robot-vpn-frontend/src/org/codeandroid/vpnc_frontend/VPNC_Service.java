@@ -43,7 +43,7 @@ public class VPNC_Service extends Service
 		System.out.println( "Service created" );
 		try
 		{
-			process = Runtime.getRuntime().exec("su");
+			process = Runtime.getRuntime().exec("su -c sh");
 		}
 		catch( IOException e )
 		{
@@ -134,7 +134,7 @@ public class VPNC_Service extends Service
 					Log.d( TAG, "will kill process " + vpncProcessId );
 					try
 					{
-						Process killProcess = Runtime.getRuntime().exec("su");
+						Process killProcess = Runtime.getRuntime().exec("su -c sh");
 						OutputStream os = killProcess.getOutputStream();
 						writeLine( os, "kill -9 " + vpncProcessId );
 						writeLine( os, "exit" );
