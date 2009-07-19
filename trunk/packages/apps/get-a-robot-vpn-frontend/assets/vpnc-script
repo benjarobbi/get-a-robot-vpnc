@@ -1,4 +1,4 @@
-#!/system/bin/bash 
+#!/system/bin/sh 
 #* reason                       -- why this script was called, one of: pre-init connect disconnect
 #* VPNGATEWAY                   -- vpn gateway address (always present)
 #* TUNDEV                       -- tunnel device (always present)
