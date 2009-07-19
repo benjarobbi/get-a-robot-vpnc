@@ -67,26 +67,20 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 		getListView().setOnCreateContextMenuListener( createContextMenuListener );
 		ShowNetworks();
-	}
-
-	@Override
-	protected void onStart()
-	{
-		super.onStart();
-		if( vpnEnabled.isChecked() && vpncService == null )
+		if( vpnEnabled.isChecked() )
 		{
 			connectToService();
 		}
 	}
 
 	@Override
-	protected void onStop()
+	protected void onDestroy()
 	{
 		if( vpncService != null )
 		{
 			disconnectFromService();
 		}
-		super.onStop();
+		super.onDestroy();
 	}
 
 	private OnCreateContextMenuListener createContextMenuListener = new OnCreateContextMenuListener()
@@ -132,11 +126,23 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 			switch( item.getItemId() )
 			{
 				case 0:
-					NetworkConnectionInfo info = NetworkDatabase.getNetworkDatabase( this ).singleNetwork( networkPreference._id );
+					NetworkConnectionInfo info = NetworkDatabase.getNetworkDatabase(this).singleNetwork( networkPreference._id );
 					try
 					{
-						vpncService.connect( info.getIpSecGateway(), info.getIpSecId(), info.getIpSecSecret(), info.getXauth(), info.getPassword() );
-						connectedVpnId = info.getId();
+						boolean connected = vpncService.connect( info.getIpSecGateway(), info.getIpSecId(), info.getIpSecSecret(), info.getXauth(), info.getPassword() );
+						if( connected )
+						{
+							long timestamp = System.currentTimeMillis();
+							info.setLastConnect(timestamp);
+							NetworkDatabase.getNetworkDatabase(this).updateNetwork(info);
+							connectedVpnId = info.getId();
+							networkPreference.setLastConnect(timestamp);
+							networkPreference.setSummary(R.string.connected);
+						}
+						else
+						{
+							networkPreference.setSummary(R.string.failed_connect);
+						}
 					}
 					catch( RemoteException e )
 					{
@@ -151,6 +157,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 						{
 							vpncService.disconnect();
 							connectedVpnId = -1;
+							networkPreference.refreshNetworkState();
 						}
 						catch( RemoteException e )
 						{
@@ -247,6 +254,12 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	private void connectToService()
 	{
 		System.out.println( "Will connect to service" );
+		
+//		Intent intent = new Intent("android.intent.action.superuser"); // superuser request
+//		intent.putExtra("name", this.getClass().getSimpleName()); // tell Superuser the name of the requesting app
+//		intent.putExtra("packagename", this.getClass().getPackage().getName()); // tel Superuser the name of the requesting package
+//		startActivityForResult(intent, 1234); // make the request!
+		
 		// Call start service first so the service lifecycle isn't tied to this activity
 		startService( vpncIntent );
 		bindService( vpncIntent, serviceConnection, Context.BIND_AUTO_CREATE );

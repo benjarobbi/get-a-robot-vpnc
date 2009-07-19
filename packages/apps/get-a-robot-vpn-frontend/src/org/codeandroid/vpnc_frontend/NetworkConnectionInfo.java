@@ -10,7 +10,7 @@ public class NetworkConnectionInfo
 	private String ipSecSecret;
 	private String xauth;
 	private String password;
-	private int lastConnect;
+	private long lastConnect;
 
 	public int getId()
 	{
@@ -82,12 +82,12 @@ public class NetworkConnectionInfo
 		this.password = password;
 	}
 
-	public int getLastConnect()
+	public long getLastConnect()
 	{
 		return lastConnect;
 	}
 
-	public void setLastConnect(int lastConnect)
+	public void setLastConnect(long lastConnect)
 	{
 		this.lastConnect = lastConnect;
 	}
