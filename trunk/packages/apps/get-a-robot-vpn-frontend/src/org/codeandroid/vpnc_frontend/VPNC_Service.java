@@ -22,6 +22,7 @@ public class VPNC_Service extends Service
 	private LoggingThread stderrLogging;
 	private int vpncProcessId;
 
+
 	@Override
 	public IBinder onBind(Intent intent)
 	{
@@ -86,7 +87,7 @@ public class VPNC_Service extends Service
 					{
 						Log.d( TAG, readString( is ) );
 					}
-					writeLine( os, "/data/data/org.codeandroid.vpnc_frontend/vpnc --script /data/data/org.codeandroid.vpnc_frontend/vpnc-script --no-detach" );
+					writeLine( os, "/data/data/org.codeandroid.vpnc_frontend/files/vpnc --script /data/data/org.codeandroid.vpnc_frontend/files/vpnc-script --no-detach" );
 
 					Log.d( TAG, readString( is ) );
 					Log.d( TAG, "IP " + gateway );
