@@ -66,10 +66,10 @@ public class BackendFileManager extends Activity
 	{
 
 
-                File dstfile = new File( getFilesDir() + "/" + fileName ); 
+                File dstFile = new File( getFilesDir() + "/" + fileName ); 
  
-                if (dstfile.exists()) { 
-                        Log.i(LOG_TAG, "File exists, not copying"); 
+                if (dstFile.exists()) { 
+                        Log.i(LOG_TAG, "File: " + dstFile + "exists, not copying"); 
 			return; 
                 } 
 
@@ -94,19 +94,22 @@ public class BackendFileManager extends Activity
 
 	private void symlinkFile(String res, String lnk) throws IOException {
 
+		String resLocation = getFilesDir() + "/" + res;
+		String lnkLocation = getFilesDir() + "/" + lnk;
 
-		File linkfil = new File(lnk);
+		File linkfil = new File(lnkLocation);
 
 		if (linkfil.exists()) {
-			Log.i(LOG_TAG, "File exists, ninja");
+			Log.i(LOG_TAG, "Symbolic link " + lnk + " exists, continuing...");
+			return; 
 		}
 
 		try {
 			Process process = Runtime.getRuntime().exec("sh");
 			DataOutputStream out = new DataOutputStream(process.getOutputStream());
 
-			Log.i(LOG_TAG, "ln -s " + getFilesDir() + "/" +  res + " " + getFilesDir() + "/" +  lnk + "\n");
-			out.writeBytes("ln -s " + getFilesDir() + "/" + res + " " + getFilesDir() + "/" +  lnk + "\n");
+			Log.i(LOG_TAG, "ln -s " + resLocation + " " + lnkLocation + "\n");
+			out.writeBytes("ln -s " + resLocation + " " + lnkLocation + "\n");
 			out.writeBytes("exit\n");
 			out.flush();
 		}
