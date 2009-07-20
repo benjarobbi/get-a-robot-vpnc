@@ -58,4 +58,8 @@
 	<string name="ok">OK</string>
 	<string name="confirmation_message">Are you sure?</string>
 	<string name="backend_file_manager">Setting up system daemon files</string>
+	<string name="please_wait">Please wait...</string>
+	<string name="connecting">Trying to connect</string>
+	<string name="installing">Setting up VPN system requirements</string>
+	<string name="disconnecting">Disconnecting from VPN</string>
 </resources>

@@ -21,7 +21,11 @@ public class VPNC_Service extends Service
 	private LoggingThread stdoutLogging;
 	private LoggingThread stderrLogging;
 	private int vpncProcessId;
-
+	
+	public VPNC_Service()
+	{
+		Log.d( TAG, "VPNC_Service instantiated" );
+	}
 
 	@Override
 	public IBinder onBind(Intent intent)
@@ -41,28 +45,19 @@ public class VPNC_Service extends Service
 	public void onCreate()
 	{
 		super.onCreate();
-		System.out.println( "Service created" );
-		try
-		{
-			process = Runtime.getRuntime().exec("su -c sh");
-		}
-		catch( IOException e )
-		{
-			throw new RuntimeException( e );
-		}
+		Log.d( TAG, "Service created" );
 	}
 
 	@Override
 	public void onDestroy()
 	{
-		System.out.println( "Service destroyed" );
-		process.destroy();
-		process = null;
+		Log.d( TAG, "Service destroyed" );
 		super.onDestroy();
 	}
 
 	private IVPNC_Service.Stub getService()
 	{
+		Log.d( TAG, "creating and returning new service object" );
 		return new IVPNC_Service.Stub()
 		{
 
@@ -71,7 +66,15 @@ public class VPNC_Service extends Service
 				Log.d( TAG, "Got called" );
 				try
 				{
-					if( ! new File("/dev/net/tun").exists() )
+					try
+					{
+						process = Runtime.getRuntime().exec("su -c sh");
+					}
+					catch( IOException e )
+					{
+						throw new RuntimeException( e );
+					}
+					if( !new File("/dev/net/tun").exists() )
 					{
 						Log.d( TAG, "tun does not exist" );
 						return false;
@@ -104,11 +107,10 @@ public class VPNC_Service extends Service
 					Log.d( TAG, readString( is ) );
 					Log.d( TAG, "password " + String.valueOf( maskedPassword ) );
 					writeLine( os, password );
-					Log.d( TAG, readString( is ) );
 					Log.d( TAG, "done with vpnc" );
 					stdoutLogging = new LoggingThread( is, "process stdout", Log.DEBUG );
 					stdoutLogging.start();
-					stderrLogging = new LoggingThread( process.getErrorStream(), "process stderr", Log.ERROR );
+					stderrLogging = new LoggingThread( process.getErrorStream(), "process stderr", Log.VERBOSE );
 					stderrLogging.start();
 					getProcessId();
 					if( vpncProcessId > 0 )
@@ -137,21 +139,27 @@ public class VPNC_Service extends Service
 					{
 						Process killProcess = Runtime.getRuntime().exec("su -c sh");
 						OutputStream os = killProcess.getOutputStream();
-						writeLine( os, "kill -9 " + vpncProcessId );
+						writeLine( os, "kill " + vpncProcessId );
 						writeLine( os, "exit" );
-						readString( killProcess.getInputStream() );
-						readString( killProcess.getErrorStream() );
+						os.close();
+						Log.d( TAG, "killProcess exited with exit value of " + killProcess.waitFor() );
 						killProcess.destroy();
+						stderrLogging.quit();
+						stdoutLogging.quit();
+						process.destroy();
+						process = null;
+						vpncProcessId = -1;
 						Log.d( TAG, "process killed" );
 					}
 					catch( IOException e )
 					{
 						Log.e( TAG, e.getMessage(), e );
 					}
+					catch( InterruptedException e )
+					{
+						Log.e( TAG, e.getMessage(), e );
+					}
 				}
-				stdoutLogging.quit();
-				stderrLogging.quit();
-				process.destroy();
 				return true;
 			}
 		};
