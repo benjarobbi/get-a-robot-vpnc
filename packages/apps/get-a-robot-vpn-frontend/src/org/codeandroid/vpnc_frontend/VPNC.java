@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.CheckBoxPreference;
@@ -92,6 +93,13 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		editor.putInt( "connectedVpnId", connectedVpnId );
 		editor.commit();
 		super.onPause();
+	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig)
+	{
+		Log.d( TAG, "Configuration Changed. I'd rather handle it myself (and ignore it for now) than have the OS blow up all I've got in the middle of a connection!" );
+		super.onConfigurationChanged( newConfig );
 	}
 
 	private OnCreateContextMenuListener createContextMenuListener = new OnCreateContextMenuListener()
