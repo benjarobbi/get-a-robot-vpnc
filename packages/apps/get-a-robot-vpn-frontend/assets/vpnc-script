@@ -39,7 +39,7 @@
 # 1) Maybe dnsmasq can do something like that
 # 2) Parse dns packets going out via tunnel and redirect them to original dns-server
 
-env | sort
+# env | sort
 # set -x 
 
 # =========== script (variable) setup ====================================
