@@ -12,17 +12,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
-// This class manages the creation of files on the disk in the /data/data/ direcotry.
+// This class manages the creation of files on the disk in the /data/data/ directory.
 public class BackendFileManager extends Activity
 {
 
-	private final String LOG_TAG = "VPNC_filemanager";
+	private final static String LOG_TAG = "VPNC_filemanager";
+	private static String[] files = {"vpnc", "vpnc-script", "bb", "make-tun-device"};
 
 	private Handler handler = new Handler();
-
-	// FIXME: make symlinks for the route/ifconfig to bb portably/sanely.
-	// Ideally i'd like to iterate through the list, but can't see an easy way 
-	private static String[] files = {"vpnc", "vpnc-script", "bb", "make-tun-device"};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -43,7 +40,6 @@ public class BackendFileManager extends Activity
 					{
 						copyFromAsset( files[i] );
 					}
-
 				}
 				catch( Throwable t )
 				{
@@ -63,13 +59,24 @@ public class BackendFileManager extends Activity
 
 				try
 				{
-					if( ( !new File( "/dev/net/tun" ).exists() ) && new File( "/dev/tun" ).exists() )
+					if( !new File( "/dev/net/tun" ).exists() )
 					{
-						if( !new File( "/dev/net" ).exists() )
+						if( new File( "/dev/tun" ).exists() )
 						{
-							createDirectory( true, "/dev/net" );
+							if( !new File( "/dev/net" ).exists() )
+							{
+								createDirectory( true, "/dev/net" );
+							}
+							symlinkFile( true, "/dev/tun", "/dev/net/tun" );
 						}
-						symlinkFile( true, "/dev/tun", "/dev/net/tun" );
+						else
+						{
+							Log.e( LOG_TAG, "There is no tun either at /dev/net or /dev" );
+						}
+					}
+					else
+					{
+						Log.d( LOG_TAG, "Found /dev/net/tun in place" );
 					}
 				}
 				catch( IOException e )
@@ -132,7 +139,6 @@ public class BackendFileManager extends Activity
 
 	private void symlinkFile(boolean asRoot, String res, String lnk) throws IOException
 	{
-
 		File linkfil = new File( lnk );
 
 		if( linkfil.exists() )
@@ -169,7 +175,6 @@ public class BackendFileManager extends Activity
 
 	private void setFilesExecutable() throws IOException
 	{
-
 		Process process = Runtime.getRuntime().exec( "sh" );
 		DataOutputStream out = new DataOutputStream( process.getOutputStream() );
 		out.writeBytes( "chmod 755 " + getFilesDir() + "/*\n" );
@@ -188,7 +193,6 @@ public class BackendFileManager extends Activity
 
 	private void createDirectory(boolean asRoot, String dir) throws IOException
 	{
-
 		Process process;
 		if( asRoot )
 		{
