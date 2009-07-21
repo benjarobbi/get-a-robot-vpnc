@@ -30,7 +30,7 @@ public class VpncProcessHandler
 		}
 	}
 
-	public boolean connect(String gateway, String id, String secret, String xauth, String password)
+	public boolean connect(VPNC vpnc, NetworkConnectionInfo info)
 	{
 		if( vpncProcessId > 0 )
 		{
@@ -51,6 +51,11 @@ public class VpncProcessHandler
 		}
 		try
 		{
+			String gateway = info.getIpSecGateway();
+			String ipsecId = info.getIpSecId();
+			String secret = info.getIpSecSecret();
+			String password = info.getPassword();
+			String xauth = info.getXauth();
 			process = Runtime.getRuntime().exec("su -c sh");
 			if( !new File("/dev/net/tun").exists() )
 			{
@@ -74,8 +79,8 @@ public class VpncProcessHandler
 			Log.d( TAG, "IP " + gateway );
 			writeLine( os, gateway );
 			Log.d( TAG, readString( is ) );
-			Log.d( TAG, "group id: " + id );
-			writeLine( os, id );
+			Log.d( TAG, "group id: " + ipsecId );
+			writeLine( os, ipsecId );
 			Log.d( TAG, readString( is ) );
 			Log.d( TAG, "group pwd " + secret );
 			writeLine( os, secret );
@@ -121,6 +126,7 @@ public class VpncProcessHandler
 				os.close();
 				Log.d( TAG, "killProcess exited with exit value of " + killProcess.waitFor() );
 				killProcess.destroy();
+				vpncProcessId = -1;
 				
 				if( process != null )
 				{
@@ -128,7 +134,6 @@ public class VpncProcessHandler
 					stdoutLogging.quit();
 					process.destroy();
 					process = null;
-					vpncProcessId = -1;
 					Log.d( TAG, "process killed" );
 				}
 			}
