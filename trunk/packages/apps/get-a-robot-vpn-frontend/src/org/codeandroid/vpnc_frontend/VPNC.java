@@ -57,12 +57,13 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		passwordDialog = new Dialog(this);
 		connectedVpnId = getPreferences(MODE_PRIVATE).getInt( "connectedVpnId", -1 );
 		vpncHandler = new VpncProcessHandler();
-		if( vpncHandler.isConnected() == false )
+		if( vpncHandler.isConnected() == false && connectedVpnId != -1 )
 		{
 			//maybe the phone has been restarted or the vpnc process killed some other how
 			connectedVpnId = -1;
+			saveConnectedVpnId();
 		}
-		if( connectedVpnId > 0 && vpncHandler.isConnected() )
+		if( connectedVpnId != -1 && vpncHandler.isConnected() )
 		{
 			Log.d( TAG, "Last saved state indicates that we're connected to connection #" + connectedVpnId );
 		}
@@ -89,12 +90,18 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	@Override
 	protected void onPause()
 	{
-		Editor editor = getPreferences(MODE_PRIVATE).edit();
-		editor.putInt( "connectedVpnId", connectedVpnId );
-		editor.commit();
+		saveConnectedVpnId();
 		super.onPause();
 	}
 	
+	
+	private void saveConnectedVpnId()
+	{
+		Editor editor = getPreferences(MODE_PRIVATE).edit();
+		editor.putInt( "connectedVpnId", connectedVpnId );
+		editor.commit();
+	}
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig)
 	{
@@ -171,7 +178,11 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 							{
 								public void run()
 								{
-									connectedVpnId = -1;
+									if( connectedVpnId != -1 )
+									{
+										connectedVpnId = -1;
+										saveConnectedVpnId();
+									}
 									networkPreference.refreshNetworkState();
 									disconnectProgressDialog.dismiss();
 								}
@@ -219,6 +230,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 					info.setLastConnect( timestamp );
 					NetworkDatabase.getNetworkDatabase( VPNC.this ).updateNetwork( info );
 					connectedVpnId = info.getId();
+					saveConnectedVpnId();
 					networkPreference.setLastConnect( timestamp );
 					networkPreference.setSummary( R.string.connected );
 				}
@@ -323,7 +335,11 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 				else
 				{
 					vpncHandler.disconnect();
-					connectedVpnId = -1;
+					if( connectedVpnId != -1 )
+					{
+						connectedVpnId = -1;
+						saveConnectedVpnId();
+					}
 				}
 				return true;
 			}
