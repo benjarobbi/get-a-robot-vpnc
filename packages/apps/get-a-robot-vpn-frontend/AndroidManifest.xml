@@ -17,12 +17,5 @@
 			</intent-filter>
 		</activity>
 
-		<service class=".VPNC_Service" android:name="VPNC_Service"
-			android:label="VPNC">
-			<intent-filter>
-				<action android:name="org.codeandroid.vpnc_frontend.IVPNC_Service" />
-			</intent-filter>
-		</service>
-
 	</application>
 </manifest> 
