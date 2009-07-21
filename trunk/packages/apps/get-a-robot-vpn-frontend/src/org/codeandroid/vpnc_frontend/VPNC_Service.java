@@ -25,6 +25,14 @@ public class VPNC_Service extends Service
 	public VPNC_Service()
 	{
 		Log.d( TAG, "VPNC_Service instantiated" );
+		try
+		{
+			getProcessId();
+		}
+		catch( IOException e )
+		{
+			Log.e( TAG, "While trying to read process id", e );
+		}
 	}
 
 	@Override
@@ -63,17 +71,26 @@ public class VPNC_Service extends Service
 
 			public boolean connect(String gateway, String id, String secret, String xauth, String password) throws RemoteException
 			{
-				Log.d( TAG, "Got called" );
-				try
+				if( vpncProcessId > 0 )
 				{
+					Log.d( TAG, "Asked to connect but there is a pid for an existing vpnc connection" );
 					try
 					{
-						process = Runtime.getRuntime().exec("su -c sh");
+						getProcessId(); //double-check if we're still connected
 					}
 					catch( IOException e )
 					{
-						throw new RuntimeException( e );
+						Log.e( TAG, "While trying to read process id", e );
 					}
+					if( vpncProcessId > 0 )
+					{
+						Log.w( TAG, "Asked to connect but there is a pid for an existing vpnc connection" );
+						return false;
+					}
+				}
+				try
+				{
+					process = Runtime.getRuntime().exec("su -c sh");
 					if( !new File("/dev/net/tun").exists() )
 					{
 						Log.d( TAG, "tun does not exist" );
@@ -131,7 +148,6 @@ public class VPNC_Service extends Service
 
 			public boolean disconnect() throws RemoteException
 			{
-				Log.d( TAG, "Got called with disconnect" );
 				if( vpncProcessId > 0 )
 				{
 					Log.d( TAG, "will kill process " + vpncProcessId );
@@ -144,12 +160,16 @@ public class VPNC_Service extends Service
 						os.close();
 						Log.d( TAG, "killProcess exited with exit value of " + killProcess.waitFor() );
 						killProcess.destroy();
-						stderrLogging.quit();
-						stdoutLogging.quit();
-						process.destroy();
-						process = null;
-						vpncProcessId = -1;
-						Log.d( TAG, "process killed" );
+						
+						if( process != null )
+						{
+							stderrLogging.quit();
+							stdoutLogging.quit();
+							process.destroy();
+							process = null;
+							vpncProcessId = -1;
+							Log.d( TAG, "process killed" );
+						}
 					}
 					catch( IOException e )
 					{
@@ -159,8 +179,13 @@ public class VPNC_Service extends Service
 					{
 						Log.e( TAG, e.getMessage(), e );
 					}
+					return true;
 				}
-				return true;
+				else
+				{
+					Log.d( TAG, "Will ignore disconnect call, no vpnc pid stored" );
+					return false;
+				}
 			}
 		};
 	}
@@ -171,22 +196,41 @@ public class VPNC_Service extends Service
 		OutputStream os = psProcess.getOutputStream();
 		InputStream is = psProcess.getInputStream();
 		writeLine( os, "ps | grep 'vpnc$' | cut -c 10-13" );
-		String pidString = readString(is).trim();
-		if( pidString == null || pidString.length() == 0 )
+		writeLine( os, "exit" );
+		try
 		{
+			psProcess.waitFor();
+		}
+		catch( InterruptedException interruptedException )
+		{
+			Log.e( TAG, "While trying to read process id", interruptedException );
+			return;
+		}
+		int bytesAvailable = is.available();
+		if( bytesAvailable == 0 )
+		{
+			Log.d( TAG, "Attempt to read vpnc process id did not return anything" );
 			vpncProcessId = -1;
 		}
 		else
 		{
-			try
+			String pidString = readString(is).trim();
+			Log.d( TAG, "Read vpnc process id as " + pidString );
+			if( pidString == null || pidString.length() == 0 )
 			{
-				vpncProcessId = Integer.parseInt(pidString);
-				Log.d( TAG, "Got the pid for vpnc: " + vpncProcessId );
 			}
-			catch( NumberFormatException e )
+			else
 			{
-				Log.w( TAG, "Could not parse process id of " + pidString, e );
-				vpncProcessId = 0;
+				try
+				{
+					vpncProcessId = Integer.parseInt(pidString);
+					Log.d( TAG, "Got the pid for vpnc: " + vpncProcessId );
+				}
+				catch( NumberFormatException e )
+				{
+					Log.w( TAG, "Could not parse process id of " + pidString, e );
+					vpncProcessId = 0;
+				}
 			}
 		}
 	}
