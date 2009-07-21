@@ -16,6 +16,7 @@ public class VpncProcessHandler
 	private LoggingThread stdoutLogging;
 	private LoggingThread stderrLogging;
 	private int vpncProcessId;
+	private NetworkConnectionInfo connectionInProgress;
 	
 	public VpncProcessHandler()
 	{
@@ -30,7 +31,7 @@ public class VpncProcessHandler
 		}
 	}
 
-	public boolean connect(VPNC vpnc, NetworkConnectionInfo info)
+	public void connect(final VPNC vpnc, NetworkConnectionInfo info)
 	{
 		if( vpncProcessId > 0 )
 		{
@@ -46,11 +47,12 @@ public class VpncProcessHandler
 			if( vpncProcessId > 0 )
 			{
 				Log.w( TAG, "Asked to connect but there is a pid for an existing vpnc connection" );
-				return false;
+				vpnc.setConnected( false, info );
 			}
 		}
 		try
 		{
+			this.connectionInProgress = info;
 			String gateway = info.getIpSecGateway();
 			String ipsecId = info.getIpSecId();
 			String secret = info.getIpSecSecret();
@@ -60,15 +62,11 @@ public class VpncProcessHandler
 			if( !new File("/dev/net/tun").exists() )
 			{
 				Log.d( TAG, "tun does not exist" );
-				return false;
+				vpnc.setConnected( false, info );
+				this.connectionInProgress = null;
 			}
 			OutputStream os = process.getOutputStream();
 			InputStream is = process.getInputStream();
-			char[] maskedPassword = password.toCharArray();
-			for( int i = 0; i < maskedPassword.length; i++ )
-			{
-				maskedPassword[i] = '*';
-			}
 			if( is.available() > 0 )
 			{
 				Log.d( TAG, readString( is ) );
@@ -88,7 +86,43 @@ public class VpncProcessHandler
 			Log.d( TAG, "user " + xauth );
 			writeLine( os, xauth );
 			Log.d( TAG, readString( is ) );
-			Log.d( TAG, "password " + String.valueOf( maskedPassword ) );
+			if( password == null || password.length() == 0 )
+			{
+				Runnable uiTask = new Runnable()
+				{
+					public void run()
+					{
+						vpnc.getPassword();
+					}
+				};
+				vpnc.getHandler().post( uiTask );
+			}
+			else
+			{
+				continueConnection(vpnc, info.getPassword());
+			}
+		}
+		catch( IOException e )
+		{
+			Log.e( TAG, "While reading from / writing to process stream", e );
+			vpnc.setConnected( false, info );
+			this.connectionInProgress = null;
+		}
+	}
+
+	public void continueConnection(VPNC vpnc, String password)
+	{
+		NetworkConnectionInfo info = this.connectionInProgress;
+		try
+		{
+			OutputStream os = process.getOutputStream();
+			InputStream is = process.getInputStream();
+			char[] maskedPassword = password.toCharArray();
+			for( int i = 0; i < maskedPassword.length; i++ )
+			{
+				maskedPassword[i] = '*';
+			}
+			Log.d( TAG, "password " + String.valueOf(maskedPassword) );
 			writeLine( os, password );
 			Log.d( TAG, "done with vpnc" );
 			stdoutLogging = new LoggingThread( is, "process stdout", Log.DEBUG );
@@ -98,17 +132,20 @@ public class VpncProcessHandler
 			getProcessId();
 			if( vpncProcessId > 0 )
 			{
-				return true;
+				vpnc.setConnected(true, info);
+				this.connectionInProgress = null;
 			}
 			else
 			{
-				return false;
+				vpnc.setConnected(false, info);
+				this.connectionInProgress = null;
 			}
 		}
 		catch( IOException e )
 		{
-			e.printStackTrace();
-			return false;
+			Log.e( TAG, "While reading from / writing to process stream", e );
+			vpnc.setConnected(false, info);
+			this.connectionInProgress = null;
 		}
 	}
 
