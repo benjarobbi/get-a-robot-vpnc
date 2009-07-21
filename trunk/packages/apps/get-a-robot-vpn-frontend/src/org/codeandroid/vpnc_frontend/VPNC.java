@@ -2,6 +2,7 @@ package org.codeandroid.vpnc_frontend;
 
 import java.util.List;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
@@ -18,7 +19,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class VPNC extends PreferenceActivity implements OnPreferenceClickListener
@@ -30,6 +34,8 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 	private VpncProcessHandler vpncHandler;
 	private Handler handler = new Handler();
+	private ProgressDialog progressDialog;
+	private Dialog passwordDialog;
 	private int connectedVpnId;
 
 	private final int SUB_ACTIVITY_REQUEST_CODE = 1;
@@ -47,6 +53,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate( savedInstanceState );
+		passwordDialog = new Dialog(this);
 		connectedVpnId = getPreferences(MODE_PRIVATE).getInt( "connectedVpnId", -1 );
 		vpncHandler = new VpncProcessHandler();
 		if( vpncHandler.isConnected() == false )
@@ -131,34 +138,13 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 			{
 				case 0:
 					final NetworkConnectionInfo info = NetworkDatabase.getNetworkDatabase( this ).singleNetwork( networkPreference._id );
-					final ProgressDialog progressDialog = ProgressDialog.show( this, getString(R.string.please_wait), getString(R.string.connecting) );
+					progressDialog = ProgressDialog.show( this, getString(R.string.please_wait), getString(R.string.connecting) );
 					Thread thread = new Thread()
 					{
 						@Override
 						public void run()
 						{
-							final boolean connected = vpncHandler.connect( VPNC.this, info );
-							Runnable uiTask = new Runnable()
-							{
-								public void run()
-								{
-									if( connected )
-									{
-										long timestamp = System.currentTimeMillis();
-										info.setLastConnect( timestamp );
-										NetworkDatabase.getNetworkDatabase( VPNC.this ).updateNetwork( info );
-										connectedVpnId = info.getId();
-										networkPreference.setLastConnect( timestamp );
-										networkPreference.setSummary( R.string.connected );
-									}
-									else
-									{
-										networkPreference.setSummary( R.string.failed_connect );
-									}
-									progressDialog.dismiss();
-								}
-							};
-							handler.post( uiTask );
+							vpncHandler.connect( VPNC.this, info );
 						}
 					};
 					thread.start();
@@ -199,6 +185,63 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		}
 		return false;
 	}
+
+	public void setConnected(final boolean connected, final NetworkConnectionInfo info)
+	{
+		NetworkPreference networkPreferenceFound = null;
+		for( int index = 0; index < networkList.getPreferenceCount() && networkPreferenceFound == null; index++ )
+		{
+			NetworkPreference candidate = (NetworkPreference)networkList.getPreference(index);
+			if( candidate._id == info.getId() )
+			{
+				networkPreferenceFound = candidate;
+			}
+		}
+		final NetworkPreference networkPreference = networkPreferenceFound;
+		
+		//The network list shouldn't have changed so I'm banking on networkPreference not being null now
+		Runnable uiTask = new Runnable()
+		{
+
+			public void run()
+			{
+				if( connected )
+				{
+					long timestamp = System.currentTimeMillis();
+					info.setLastConnect( timestamp );
+					NetworkDatabase.getNetworkDatabase( VPNC.this ).updateNetwork( info );
+					connectedVpnId = info.getId();
+					networkPreference.setLastConnect( timestamp );
+					networkPreference.setSummary( R.string.connected );
+				}
+				else
+				{
+					networkPreference.setSummary( R.string.failed_connect );
+				}
+				progressDialog.dismiss();
+			}
+		};
+		handler.post( uiTask );
+	}
+	
+	public void getPassword()
+	{
+		passwordDialog.setContentView(R.layout.password_dialog);
+		passwordDialog.setTitle(R.string.please_type_password);
+		Button okButton = (Button)passwordDialog.findViewById( R.id.okPasswordButton );
+		okButton.setOnClickListener(okPasswordOnClickListener);
+		passwordDialog.show();
+	}
+	
+	private OnClickListener okPasswordOnClickListener = new OnClickListener()
+	{
+		public void onClick(View view)
+		{
+			String password = ((EditText)view.getRootView().findViewById(R.id.passwordEditText)).getText().toString();
+			vpncHandler.continueConnection( VPNC.this, password );
+			passwordDialog.dismiss();
+		}
+	};
 
 	/* I've been told that i should change this to use an adapter */
 	private void ShowNetworks()
@@ -277,5 +320,11 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 				return true;
 			}
 		};
+	}
+	
+	
+	public Handler getHandler()
+	{
+		return handler;
 	}
 }
