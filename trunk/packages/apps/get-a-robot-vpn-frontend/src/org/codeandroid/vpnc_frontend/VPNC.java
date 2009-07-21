@@ -137,7 +137,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 						@Override
 						public void run()
 						{
-							final boolean connected = vpncHandler.connect( info.getIpSecGateway(), info.getIpSecId(), info.getIpSecSecret(), info.getXauth(), info.getPassword() );
+							final boolean connected = vpncHandler.connect( VPNC.this, info );
 							Runnable uiTask = new Runnable()
 							{
 								public void run()
