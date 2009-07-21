@@ -26,6 +26,7 @@
 	VPNC started in foreground
 
 * This means the vpnc-script ran successfully.
+	vpnc-script ran to completion
 
 * VPN server can't be resolved/contacted
 	vpnc: unknown host `vpn99.example.com'
