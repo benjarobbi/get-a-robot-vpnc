@@ -1,0 +1,37 @@
+* This is a work in progress.
+* Lines that start with a * are my comments
+
+
+
+* Username or password incorrect.
+
+	* first attempt
+	Enter password for wmealing@vpn4.example.com 
+	* It falls back to a different prompt.(note the resolved hostname)
+	Password for VPN wmealing@62.127.227.252: 
+	* and yes, asks yet again
+	Password for VPN wmealing@62.127.227.252: 
+
+* Connect Banner 
+	* shown directly after authentication correctly, not all servers have one.
+	* could be shown as a toast ?
+	Connect Banner:
+	| ==============================
+	| Your Corp Inc
+	| Unauthorized access prohibited
+	| Violators will be prosecuted
+	| ==============================
+
+* This means that vpnc started
+	VPNC started in foreground
+
+* This means the vpnc-script ran successfully.
+
+* VPN server can't be resolved/contacted
+	vpnc: unknown host `vpn99.example.com'
+
+* vpn ipsec ID (group id) or group passwd incorrect.  (dont count on 24)
+vpnc: hash comparison failed:  (ISAKMP_N_AUTHENTICATION_FAILED)(24)
+check group password!
+
+
