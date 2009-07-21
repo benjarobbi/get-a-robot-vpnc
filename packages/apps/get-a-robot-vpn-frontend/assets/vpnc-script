@@ -45,7 +45,7 @@ env | sort
 # =========== script (variable) setup ====================================
 
 PATH=/sbin:/usr/sbin:$PATH
-RUNTIME_DATA="/sdcard/vpnc"
+RUNTIME_DATA="/data/data/org.codeandroid.vpn_frontend/files"
 PREVIOUS_DNS_SETTINGS= "$RUNTIME_DATA/previous_dns_settings"
 
 OS="`uname -s`"
@@ -147,11 +147,14 @@ modify_resolvconf_android() {
 
 	PREVIOUS_DNS1=`getprop net.dns1`	
 	PREVIOUS_DNS2=`getprop net.dns2`	
+
+	# clean up
+	rm -rf "$PREVIOUS_DNS_SETTINGS"  
 	
 	PREVIOUS_DNS_SETTINGS= "$RUNTIME_DATA/previous_dns_settings"
 	
 	# save this to a file on data directory
-	echo "$PREVIOUS_DNS1\n$PREVOIUS_DNS2" >> $PREVIOUS_DNS_SETTINGS 
+	echo "$PREVIOUS_DNS1\n$PREVOIUS_DNS2" >> "$PREVIOUS_DNS_SETTINGS"
 
 	N=1
 
@@ -207,7 +210,7 @@ do_pre_init() {
 	fi
 	# make sure tun device exists
 	if [ ! -e /dev/net/tun ]; then
-		# mknod doesn't exist on base android, use prebuild script
+		# mknod doesn't exist on base android, use prebuild binary.
 		/system/bin/make-tun-device	
 	fi
 }
@@ -244,6 +247,8 @@ do_connect() {
 	if [ -n "$INTERNAL_IP4_DNS" ]; then
 		$MODIFYRESOLVCONF
 	fi
+
+	echo "vpnc-script ran to completion"
 }
 
 do_disconnect() {
