@@ -17,7 +17,7 @@ public class BackendFileManager extends Activity
 {
 
 	private final static String LOG_TAG = "VPNC_filemanager";
-	private static String[] files = {"vpnc", "vpnc-script", "bb", "make-tun-device"};
+	private static String[] files = {"vpnc", "vpnc-script"};
 
 	private Handler handler = new Handler();
 
@@ -25,7 +25,6 @@ public class BackendFileManager extends Activity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate( savedInstanceState );
-		// setContentView(R.layout.main);
 
 		final ProgressDialog progressDialog = ProgressDialog.show( this, getString( R.string.please_wait ), getString( R.string.installing ) );
 		Thread thread = new Thread()
@@ -44,17 +43,6 @@ public class BackendFileManager extends Activity
 				catch( Throwable t )
 				{
 					Log.e( LOG_TAG, "Exception copying asset", t );
-				}
-
-				try
-				{
-					symlinkFile( false, getFilesDir() + "/" + "bb", getFilesDir() + "/" + "ifconfig" );
-					symlinkFile( false, getFilesDir() + "/" + "bb", getFilesDir() + "/" + "route" );
-
-				}
-				catch( Throwable t )
-				{
-					Log.e( LOG_TAG, "Exception attempting to create symlink", t );
 				}
 
 				try
