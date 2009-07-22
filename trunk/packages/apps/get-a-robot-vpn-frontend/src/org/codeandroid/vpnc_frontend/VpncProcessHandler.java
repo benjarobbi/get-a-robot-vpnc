@@ -23,14 +23,7 @@ public class VpncProcessHandler
 	public VpncProcessHandler()
 	{
 		Log.d( TAG, "VPNC_Service instantiated" );
-		try
-		{
-			getProcessId();
-		}
-		catch( IOException e )
-		{
-			Log.e( TAG, "While trying to read process id", e );
-		}
+		getProcessId();
 	}
 
 	public void connect(final VPNC vpnc, NetworkConnectionInfo info)
@@ -38,14 +31,7 @@ public class VpncProcessHandler
 		if( vpncProcessId > 0 )
 		{
 			Log.d( TAG, "Asked to connect but there is a pid for an existing vpnc connection" );
-			try
-			{
-				getProcessId(); //double-check if we're still connected
-			}
-			catch( IOException e )
-			{
-				Log.e( TAG, "While trying to read process id", e );
-			}
+			getProcessId(); //double-check if we're still connected
 			if( vpncProcessId > 0 )
 			{
 				Log.w( TAG, "Asked to connect but there is a pid for an existing vpnc connection" );
@@ -138,7 +124,7 @@ public class VpncProcessHandler
 			Log.d( TAG, "done interacting with vpnc" );
 			
 			//Now wait for connection confirmation, process death or timeout:
-			long idleTimeout = 60000;
+			long idleTimeout = 30000;
 			long idleInterval = 500;
 			String connectString = "vpnc-script ran to completion";
 			while( idleTimeout > 0 )
@@ -207,6 +193,7 @@ public class VpncProcessHandler
 				Log.d( TAG, msg );
 				logWriter.println(msg);
 				disconnect();
+				vpnc.setConnected(false, info);
 			}
 		}
 		catch( IOException e )
@@ -228,6 +215,10 @@ public class VpncProcessHandler
 
 	public boolean disconnect()
 	{
+		if( vpncProcessId == -1 )
+		{
+			getProcessId();
+		}
 		if( vpncProcessId > 0 )
 		{
 			Log.d( TAG, "will kill process " + vpncProcessId );
@@ -244,11 +235,14 @@ public class VpncProcessHandler
 				
 				if( process != null )
 				{
-					stderrLogging.quit();
-					stdoutLogging.quit();
 					process.destroy();
 					process = null;
 					Log.d( TAG, "process killed" );
+				}
+				if( stderrLogging != null )
+				{
+					stderrLogging.quit();
+					stdoutLogging.quit();
 				}
 			}
 			catch( IOException e )
@@ -268,43 +262,49 @@ public class VpncProcessHandler
 		}
 	}
 	
-	private void getProcessId() throws IOException
+	private void getProcessId()
 	{
-		Process psProcess = Runtime.getRuntime().exec( "sh" );
-		OutputStream os = psProcess.getOutputStream();
-		InputStream is = psProcess.getInputStream();
-		writeLine( os, null, "ps | grep 'vpnc$' | cut -c 10-13" );
-		writeLine( os, null, "exit" );
 		try
 		{
-			psProcess.waitFor();
-		}
-		catch( InterruptedException interruptedException )
-		{
-			Log.e( TAG, "While trying to read process id", interruptedException );
-			vpncProcessId = 0;
-			return;
-		}
-		String pidString = readString(is, null, false);
-		if( pidString == null || pidString.trim().length() == 0 )
-		{
-			Log.d( TAG, "Attempt to read vpnc process id did not return anything" );
-			vpncProcessId = -1;
-		}
-		else
-		{
-			pidString = pidString.trim();
-			Log.d( TAG, "Read vpnc process id as " + pidString );
+			Process psProcess = Runtime.getRuntime().exec( "sh" );
+			OutputStream os = psProcess.getOutputStream();
+			InputStream is = psProcess.getInputStream();
+			writeLine( os, null, "ps | grep 'vpnc$' | cut -c 10-14" );
+			writeLine( os, null, "exit" );
 			try
 			{
-				vpncProcessId = Integer.parseInt(pidString);
-				Log.d( TAG, "Got the pid for vpnc: " + vpncProcessId );
+				psProcess.waitFor();
 			}
-			catch( NumberFormatException e )
+			catch( InterruptedException interruptedException )
 			{
-				Log.w( TAG, "Could not parse process id of " + pidString, e );
+				Log.e( TAG, "While trying to read process id", interruptedException );
 				vpncProcessId = 0;
+				return;
 			}
+			String pidString = readString(is, null, false);
+			if( pidString == null || pidString.trim().length() == 0 )
+			{
+				Log.d( TAG, "Attempt to read vpnc process id did not return anything" );
+				vpncProcessId = -1;
+			}
+			else
+			{
+				pidString = pidString.trim();
+				Log.d( TAG, "Read vpnc process id as " + pidString );
+				try
+				{
+					vpncProcessId = Integer.parseInt(pidString);
+				}
+				catch( NumberFormatException e )
+				{
+					Log.w( TAG, "Could not parse process id of " + pidString, e );
+					vpncProcessId = 0;
+				}
+			}
+		}
+		catch( IOException e )
+		{
+			Log.e( TAG, "While trying to read process id", e );
 		}
 	}
 	
