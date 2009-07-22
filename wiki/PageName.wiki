@@ -1,4 +1,4 @@
-#summary VPN Connections - A VPN client for Cisco like VPN Servers.
+#summary VPNConnections - A VPN client for Cisco like VPN Servers.
 = Introduction =
 
 This is the first release of an installable package to allow google android phones to connect to Cisco like VPN concentrators.
@@ -32,8 +32,6 @@ http://code.google.com/p/get-a-robot-vpnc/issues/list
 
 Usernames can not contain the @ symbol.
 Does not currently work with one time pass devices (Rsa keys).
-
-
 
 
 
