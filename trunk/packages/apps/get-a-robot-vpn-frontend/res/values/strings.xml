@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">VPN Settings</string>
+	<string name="app_name">VPN Connections</string>
 	<string name="vpn_title">VPN</string>
 	<string name="vpn_summary"></string>
 	<string name="vpn_summary_on">Enabled</string>
