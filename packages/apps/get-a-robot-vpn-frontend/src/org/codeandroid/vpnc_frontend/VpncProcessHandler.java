@@ -140,7 +140,7 @@ public class VpncProcessHandler
 			//Now wait for connection confirmation, process death or timeout:
 			long idleTimeout = 60000;
 			long idleInterval = 500;
-			String connectString = "reason=connect";
+			String connectString = "vpnc-script ran to completion";
 			while( idleTimeout > 0 )
 			{
 				String stdinString = readString( is, logWriter, false );
