@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="org.codeandroid.vpnc_frontend" android:versionCode="1"
 	android:versionName="0.2">
+	<uses-sdk android:minSdkVersion="3" />
 	<application android:label="@string/app_name" android:icon="@drawable/icon">
 
 		<activity android:name=".EditNetwork" android:label="@string/add_network">
