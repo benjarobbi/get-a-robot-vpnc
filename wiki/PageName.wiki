@@ -1,0 +1,40 @@
+#summary VPN Connections - A VPN client for Cisco like VPN Servers.
+= Introduction =
+
+This is the first release of an installable package to allow google android phones to connect to Cisco like VPN concentrators.
+
+= Details =
+
+The installing phone will require:
+  * Root user privileges on the phone.
+  * /dev/tun file
+  * Kernel with tun support (or tun module).
+  * A cisco, nortel or freeswan ipsec server to connect to.
+
+
+= How To =
+
+== Installing this version ==
+
+This is available in the android market as a free application. It _should_ be called VPN Connections.  (Not sure where it will be listed as yet).
+
+The application can also be downloaded from this website and [http://developer.android.com/guide/developing/tools/adb.html#move installed using adb].
+
+== Reporting bugs ==
+
+Please inform us which ROM and version that you are using, if the /dev/tun exists, its permissions, and the output of logcat from a boot, also the version of this application that you are running.
+
+If your ROM and version are already reported in the [http://code.google.com/p/get-a-robot-vpnc/issues/list issue list], please comment in the thread as there has been some inconsistencies in reports.
+
+http://code.google.com/p/get-a-robot-vpnc/issues/list
+
+== Known issues ==
+
+Usernames can not contain the @ symbol.
+Does not currently work with one time pass devices (Rsa keys).
+
+
+
+
+
+
