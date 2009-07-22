@@ -257,9 +257,17 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	{
 		public void onClick(View view)
 		{
-			String password = ((EditText)view.getRootView().findViewById(R.id.passwordEditText)).getText().toString();
-			vpncHandler.continueConnection( VPNC.this, password );
+			final String password = ((EditText)view.getRootView().findViewById(R.id.passwordEditText)).getText().toString();
 			passwordDialog.dismiss();
+			Thread thread = new Thread()
+			{
+				@Override
+				public void run()
+				{
+					vpncHandler.continueConnection( VPNC.this, password );
+				}
+			};
+			thread.start();
 		}
 	};
 

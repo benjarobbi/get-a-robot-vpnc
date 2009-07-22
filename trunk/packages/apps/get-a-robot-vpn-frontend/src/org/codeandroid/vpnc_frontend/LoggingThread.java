@@ -36,13 +36,17 @@ public class LoggingThread extends Thread
 				if( logWriter != null )
 				{
 					logWriter.println( tag + "\t" + line );
-					logWriter.flush();
 				}
 			}
 		}
 		catch( IOException e )
 		{
 			Log.e( tag, e.getMessage(), e );
+		}
+		finally
+		{
+			logWriter.flush();
+			logWriter.close();
 		}
 	}
 

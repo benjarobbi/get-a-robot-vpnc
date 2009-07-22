@@ -73,23 +73,23 @@ public class VpncProcessHandler
 			InputStream is = process.getInputStream();
 			if( is.available() > 0 )
 			{
-				Log.d( TAG, readString( is, logWriter ) );
+				Log.d( TAG, readString( is, logWriter, true ) );
 			}
 			writeLine( os, logWriter, "/data/data/org.codeandroid.vpnc_frontend/files/vpnc --script /data/data/org.codeandroid.vpnc_frontend/files/vpnc-script --no-detach" );
 
-			Log.d( TAG, readString( is, logWriter ) );
+			Log.d( TAG, readString( is, logWriter, true ) );
 			Log.d( TAG, "IP " + gateway );
 			writeLine( os, logWriter, gateway );
-			Log.d( TAG, readString( is, logWriter ) );
+			Log.d( TAG, readString( is, logWriter, true ) );
 			Log.d( TAG, "group id: " + ipsecId );
 			writeLine( os, logWriter, ipsecId );
-			Log.d( TAG, readString( is, logWriter ) );
+			Log.d( TAG, readString( is, logWriter, true ) );
 			Log.d( TAG, "group pwd " + secret );
 			writeLine( os, logWriter, secret );
-			Log.d( TAG, readString( is, logWriter ) );
+			Log.d( TAG, readString( is, logWriter, true ) );
 			Log.d( TAG, "user " + xauth );
 			writeLine( os, logWriter, xauth );
-			Log.d( TAG, readString( is, logWriter ) );
+			Log.d( TAG, readString( is, logWriter, true ) );
 			logWriter.flush();
 			logWriter.close();
 			if( password == null || password.length() == 0 )
@@ -119,11 +119,13 @@ public class VpncProcessHandler
 	public void continueConnection(VPNC vpnc, String password)
 	{
 		NetworkConnectionInfo info = this.connectionInProgress;
+		PrintWriter logWriter = null;
 		try
 		{
-			PrintWriter logWriter = new PrintWriter( vpnc.openFileOutput( "lastConnection.log", Context.MODE_APPEND ) );
+			logWriter = new PrintWriter( vpnc.openFileOutput( "lastConnection.log", Context.MODE_APPEND ) );
 			OutputStream os = process.getOutputStream();
 			InputStream is = process.getInputStream();
+			InputStream es = process.getErrorStream();
 			char[] maskedPassword = password.toCharArray();
 			for( int i = 0; i < maskedPassword.length; i++ )
 			{
@@ -133,21 +135,78 @@ public class VpncProcessHandler
 			logWriter.println(maskedPassword);
 			writeLine( os, null, password );
 			logWriter.flush();
-			Log.d( TAG, "done with vpnc" );
-			stdoutLogging = new LoggingThread( is, logWriter, "process stdout", Log.DEBUG );
-			stdoutLogging.start();
-			stderrLogging = new LoggingThread( process.getErrorStream(), logWriter, "process stderr", Log.VERBOSE );
-			stderrLogging.start();
+			Log.d( TAG, "done interacting with vpnc" );
+			
+			//Now wait for connection confirmation, process death or timeout:
+			long idleTimeout = 60000;
+			long idleInterval = 500;
+			String connectString = "reason=connect";
+			while( idleTimeout > 0 )
+			{
+				String stdinString = readString( is, logWriter, false );
+				if( stdinString != null )
+				{
+					Log.d( "process stdout", stdinString );
+					logWriter.println( "process stdout" + "\t" + stdinString );
+				}
+				String stderrString = readString( es, logWriter, false );
+				if( stderrString != null )
+				{
+					Log.d( "process stderr", stderrString );
+					logWriter.println( "process stderr" + "\t" + stderrString );
+				}
+				String concatenation = stdinString  + " - " + stderrString;
+				if( concatenation.contains(connectString) )
+				{
+					String msg = "Connect string detected!";
+					Log.d( TAG, msg );
+					logWriter.println(msg);
+					vpnc.setConnected(true, info);
+					this.connectionInProgress = null;
+					stdoutLogging = new LoggingThread( is, logWriter, "process stdout", Log.DEBUG );
+					stdoutLogging.start();
+					stderrLogging = new LoggingThread( process.getErrorStream(), logWriter, "process stderr", Log.VERBOSE );
+					stderrLogging.start();
+					return;
+				}
+				else
+				{
+					getProcessId();
+					if( vpncProcessId == -1 )
+					{
+						String msg = "process had died, return as failed connection";
+						Log.d( TAG, msg );
+						logWriter.println(msg);
+						vpnc.setConnected(false, info);
+						this.connectionInProgress = null;
+						return;
+					}
+					else
+					{
+						//will keep waiting
+						try
+						{
+							String msg = "vpnc still trying to connect. Will check again in " + idleInterval + " milliseconds";
+							Log.d( TAG, msg );
+							logWriter.println(msg);
+							Thread.sleep(idleInterval);
+						}
+						catch( InterruptedException e )
+						{
+							Log.e( TAG, "While waiting to get vpnc process status", e );
+						}
+						idleTimeout -= idleInterval;
+					}
+				}
+			}
+			//reaching this point means we've timed out, kill process
 			getProcessId();
 			if( vpncProcessId > 0 )
 			{
-				vpnc.setConnected(true, info);
-				this.connectionInProgress = null;
-			}
-			else
-			{
-				vpnc.setConnected(false, info);
-				this.connectionInProgress = null;
+				String msg = "vpnc still trying to connect but we've timed out. Will try to kill it and return now.";
+				Log.d( TAG, msg );
+				logWriter.println(msg);
+				disconnect();
 			}
 		}
 		catch( IOException e )
@@ -155,6 +214,15 @@ public class VpncProcessHandler
 			Log.e( TAG, "While reading from / writing to process stream", e );
 			vpnc.setConnected(false, info);
 			this.connectionInProgress = null;
+		}
+		finally
+		{
+			if( logWriter != null )
+			{
+				logWriter.flush();
+				logWriter.close();
+			}
+				
 		}
 	}
 
@@ -214,33 +282,28 @@ public class VpncProcessHandler
 		catch( InterruptedException interruptedException )
 		{
 			Log.e( TAG, "While trying to read process id", interruptedException );
+			vpncProcessId = 0;
 			return;
 		}
-		int bytesAvailable = is.available();
-		if( bytesAvailable == 0 )
+		String pidString = readString(is, null, false);
+		if( pidString == null || pidString.trim().length() == 0 )
 		{
 			Log.d( TAG, "Attempt to read vpnc process id did not return anything" );
 			vpncProcessId = -1;
 		}
 		else
 		{
-			String pidString = readString(is, null).trim();
+			pidString = pidString.trim();
 			Log.d( TAG, "Read vpnc process id as " + pidString );
-			if( pidString == null || pidString.length() == 0 )
+			try
 			{
+				vpncProcessId = Integer.parseInt(pidString);
+				Log.d( TAG, "Got the pid for vpnc: " + vpncProcessId );
 			}
-			else
+			catch( NumberFormatException e )
 			{
-				try
-				{
-					vpncProcessId = Integer.parseInt(pidString);
-					Log.d( TAG, "Got the pid for vpnc: " + vpncProcessId );
-				}
-				catch( NumberFormatException e )
-				{
-					Log.w( TAG, "Could not parse process id of " + pidString, e );
-					vpncProcessId = 0;
-				}
+				Log.w( TAG, "Could not parse process id of " + pidString, e );
+				vpncProcessId = 0;
 			}
 		}
 	}
@@ -257,8 +320,13 @@ public class VpncProcessHandler
 		}
 	}
 
-	private static String readString( InputStream is, PrintWriter logWriter ) throws IOException
+	private static String readString( InputStream is, PrintWriter logWriter, boolean block ) throws IOException
 	{
+		if( !block && is.available() == 0 )
+		{
+			//Caller doesn't want to wait for data and there isn't any available right now
+			return null;
+		}
 		byte firstByte = (byte)is.read(); //wait till something becomes available
 		int available = is.available();
 		byte[] characters = new byte[available + 1];
