@@ -45,7 +45,7 @@
 # =========== script (variable) setup ====================================
 
 PATH=/sbin:/usr/sbin:$PATH
-RUNTIME_DATA="/data/data/org.codeandroid.vpn_frontend/files"
+RUNTIME_DATA="/data/data/org.codeandroid.vpnc_frontend/files"
 PREVIOUS_DNS_SETTINGS= "$RUNTIME_DATA/previous_dns_settings"
 
 OS="`uname -s`"
@@ -160,7 +160,7 @@ modify_resolvconf_android() {
 
 	for i in $INTERNAL_IP4_DNS; do
 		setprop net.dns$N $i	
-		let "N += 1" 
+		N=`expr $N + 1`
 	done
 
 }
