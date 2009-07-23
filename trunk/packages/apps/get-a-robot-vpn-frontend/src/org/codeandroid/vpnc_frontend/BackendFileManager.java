@@ -49,6 +49,11 @@ public class BackendFileManager extends Activity
 				{
 					if( !new File( "/dev/net/tun" ).exists() )
 					{
+						if( !new File("/dev/tun").exists() )
+						{
+							//Try a modprobe, what's the downside?
+							loadModule( "tun" );
+						}
 						if( new File( "/dev/tun" ).exists() )
 						{
 							if( !new File( "/dev/net" ).exists() )
@@ -199,6 +204,24 @@ public class BackendFileManager extends Activity
 		try
 		{
 			Log.i( LOG_TAG, "Done creating directory " + dir + " with return code " + process.waitFor() );
+		}
+		catch( InterruptedException e )
+		{
+			throw new RuntimeException( e );
+		}
+	}
+
+	private void loadModule(String module) throws IOException
+	{
+		Process process = Runtime.getRuntime().exec( "su -c sh" );
+		DataOutputStream out = new DataOutputStream( process.getOutputStream() );
+		out.writeBytes( "modprobe " + module + "\n" );
+		out.writeBytes( "exit\n" );
+		out.flush();
+		out.close();
+		try
+		{
+			Log.i( LOG_TAG, "Loaded module " + module + " with return code " + process.waitFor() );
 		}
 		catch( InterruptedException e )
 		{
