@@ -87,4 +87,44 @@ public class Util
 			logWriter.println(value);
 		}
 	}
+	
+	public static void debug( String msg )
+	{
+		Log.d( LOG_TAG, msg );
+	}
+	
+	public static void debug( String msg, Throwable throwable )
+	{
+		Log.d( LOG_TAG, msg, throwable );
+	}
+	
+	public static void info( String msg )
+	{
+		Log.i( LOG_TAG, msg );
+	}
+	
+	public static void info( String msg, Throwable throwable )
+	{
+		Log.i( LOG_TAG, msg, throwable );
+	}
+	
+	public static void warn( String msg )
+	{
+		Log.w( LOG_TAG, msg );
+	}
+	
+	public static void warn( String msg, Throwable throwable )
+	{
+		Log.w( LOG_TAG, msg, throwable );
+	}
+	
+	public static void error( String msg )
+	{
+		Log.e( LOG_TAG, msg );
+	}
+	
+	public static void error( String msg, Throwable throwable )
+	{
+		Log.e( LOG_TAG, msg, throwable );
+	}
 }
