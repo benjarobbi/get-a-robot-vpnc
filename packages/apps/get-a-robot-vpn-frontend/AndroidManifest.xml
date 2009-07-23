@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="org.codeandroid.vpnc_frontend" android:versionCode="3"
-	android:versionName="0.3">
+	package="org.codeandroid.vpnc_frontend" android:versionCode="4"
+	android:versionName="0.4">
 	<uses-sdk android:minSdkVersion="3" />
 	<application android:label="@string/app_name" android:icon="@drawable/icon">
     	<meta-data	android:name="com.a0soft.gphone.aTrackDog.webURL"
 					android:value="http://code.google.com/p/get-a-robot-vpnc/" />
     	<meta-data	android:name="com.a0soft.gphone.aTrackDog.dlURL"
-					android:value="http://get-a-robot-vpnc.googlecode.com/files/VPN_Connections_v03.apk" />
+					android:value="http://get-a-robot-vpnc.googlecode.com/files/VPN_Connections_v04.apk" />
 
 		<activity android:name=".EditNetwork" android:label="@string/add_network">
 		</activity>
