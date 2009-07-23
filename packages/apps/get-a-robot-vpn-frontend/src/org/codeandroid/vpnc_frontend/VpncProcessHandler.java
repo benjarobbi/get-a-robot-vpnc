@@ -12,8 +12,6 @@ import android.util.Log;
 
 public class VpncProcessHandler
 {
-	private static final String TAG = "vpnc service";
-	
 	private Process process;
 	private LoggingThread stdoutLogging;
 	private LoggingThread stderrLogging;
@@ -22,7 +20,7 @@ public class VpncProcessHandler
 	
 	public VpncProcessHandler()
 	{
-		Log.d( TAG, "VPNC_Service instantiated" );
+		Util.debug( "VPNC_Service instantiated" );
 		vpncProcessId = Util.getProcessId();
 	}
 
@@ -30,11 +28,11 @@ public class VpncProcessHandler
 	{
 		if( vpncProcessId > 0 )
 		{
-			Log.d( TAG, "Asked to connect but there is a pid for an existing vpnc connection" );
+			Util.debug( "Asked to connect but there is a pid for an existing vpnc connection" );
 			vpncProcessId = Util.getProcessId(); //double-check if we're still connected
 			if( vpncProcessId > 0 )
 			{
-				Log.w( TAG, "Asked to connect but there is a pid for an existing vpnc connection" );
+				Util.warn( "Asked to connect but there is a pid for an existing vpnc connection" );
 				vpnc.setConnected( false, info );
 			}
 		}
@@ -49,7 +47,7 @@ public class VpncProcessHandler
 			process = Runtime.getRuntime().exec("su -c sh");
 			if( !new File("/dev/net/tun").exists() )
 			{
-				Log.d( TAG, "tun does not exist" );
+				Util.debug( "tun does not exist" );
 				vpnc.setConnected( false, info );
 				this.connectionInProgress = null;
 			}
@@ -59,23 +57,23 @@ public class VpncProcessHandler
 			InputStream is = process.getInputStream();
 			if( is.available() > 0 )
 			{
-				Log.d( TAG, Util.readString( is, logWriter, true ) );
+				Util.debug( Util.readString( is, logWriter, true ) );
 			}
 			Util.writeLine( os, logWriter, "/data/data/org.codeandroid.vpnc_frontend/files/vpnc --script /data/data/org.codeandroid.vpnc_frontend/files/vpnc-script --no-detach" );
 
-			Log.d( TAG, Util.readString( is, logWriter, true ) );
-			Log.d( TAG, "IP " + gateway );
+			Util.debug( Util.readString( is, logWriter, true ) );
+			Util.debug( "IP " + gateway );
 			Util.writeLine( os, logWriter, gateway );
-			Log.d( TAG, Util.readString( is, logWriter, true ) );
-			Log.d( TAG, "group id: " + ipsecId );
+			Util.debug( Util.readString( is, logWriter, true ) );
+			Util.debug( "group id: " + ipsecId );
 			Util.writeLine( os, logWriter, ipsecId );
-			Log.d( TAG, Util.readString( is, logWriter, true ) );
-			Log.d( TAG, "group pwd " + secret );
+			Util.debug( Util.readString( is, logWriter, true ) );
+			Util.debug( "group pwd " + secret );
 			Util.writeLine( os, logWriter, secret );
-			Log.d( TAG, Util.readString( is, logWriter, true ) );
-			Log.d( TAG, "user " + xauth );
+			Util.debug( Util.readString( is, logWriter, true ) );
+			Util.debug( "user " + xauth );
 			Util.writeLine( os, logWriter, xauth );
-			Log.d( TAG, Util.readString( is, logWriter, true ) );
+			Util.debug( Util.readString( is, logWriter, true ) );
 			logWriter.flush();
 			logWriter.close();
 			if( password == null || password.length() == 0 )
@@ -96,7 +94,7 @@ public class VpncProcessHandler
 		}
 		catch( IOException e )
 		{
-			Log.e( TAG, "While reading from / writing to process stream", e );
+			Util.error( "While reading from / writing to process stream", e );
 			vpnc.setConnected( false, info );
 			this.connectionInProgress = null;
 		}
@@ -117,11 +115,11 @@ public class VpncProcessHandler
 			{
 				maskedPassword[i] = '*';
 			}
-			Log.d( TAG, "password " + String.valueOf(maskedPassword) );
+			Util.debug( "password " + String.valueOf(maskedPassword) );
 			logWriter.println(maskedPassword);
 			Util.writeLine( os, null, password );
 			logWriter.flush();
-			Log.d( TAG, "done interacting with vpnc" );
+			Util.debug( "done interacting with vpnc" );
 			
 			//Now wait for connection confirmation, process death or timeout:
 			long idleTimeout = 30000;
@@ -145,7 +143,7 @@ public class VpncProcessHandler
 				if( concatenation.contains(connectString) )
 				{
 					String msg = "Connect string detected!";
-					Log.d( TAG, msg );
+					Util.debug( msg );
 					logWriter.println(msg);
 					vpnc.setConnected(true, info);
 					this.connectionInProgress = null;
@@ -161,7 +159,7 @@ public class VpncProcessHandler
 					if( vpncProcessId == -1 )
 					{
 						String msg = "process had died, return as failed connection";
-						Log.d( TAG, msg );
+						Util.debug( msg );
 						logWriter.println(msg);
 						vpnc.setConnected(false, info);
 						this.connectionInProgress = null;
@@ -173,13 +171,13 @@ public class VpncProcessHandler
 						try
 						{
 							String msg = "vpnc still trying to connect. Will check again in " + idleInterval + " milliseconds";
-							Log.d( TAG, msg );
+							Util.debug( msg );
 							logWriter.println(msg);
 							Thread.sleep(idleInterval);
 						}
 						catch( InterruptedException e )
 						{
-							Log.e( TAG, "While waiting to get vpnc process status", e );
+							Util.error( "While waiting to get vpnc process status", e );
 						}
 						idleTimeout -= idleInterval;
 					}
@@ -190,7 +188,7 @@ public class VpncProcessHandler
 			if( vpncProcessId > 0 )
 			{
 				String msg = "vpnc still trying to connect but we've timed out. Will try to kill it and return now.";
-				Log.d( TAG, msg );
+				Util.debug( msg );
 				logWriter.println(msg);
 				disconnect();
 				vpnc.setConnected(false, info);
@@ -198,7 +196,7 @@ public class VpncProcessHandler
 		}
 		catch( IOException e )
 		{
-			Log.e( TAG, "While reading from / writing to process stream", e );
+			Util.error( "While reading from / writing to process stream", e );
 			vpnc.setConnected(false, info);
 			this.connectionInProgress = null;
 		}
@@ -221,7 +219,7 @@ public class VpncProcessHandler
 		}
 		if( vpncProcessId > 0 )
 		{
-			Log.d( TAG, "will kill process " + vpncProcessId );
+			Util.debug( "will kill process " + vpncProcessId );
 			try
 			{
 				Process killProcess = Runtime.getRuntime().exec("su -c sh");
@@ -229,7 +227,7 @@ public class VpncProcessHandler
 				Util.writeLine( os, null, "kill " + vpncProcessId );
 				Util.writeLine( os, null, "exit" );
 				os.close();
-				Log.d( TAG, "killProcess exited with exit value of " + killProcess.waitFor() );
+				Util.debug( "killProcess exited with exit value of " + killProcess.waitFor() );
 				killProcess.destroy();
 				vpncProcessId = -1;
 				
@@ -237,7 +235,7 @@ public class VpncProcessHandler
 				{
 					process.destroy();
 					process = null;
-					Log.d( TAG, "process killed" );
+					Util.debug( "process killed" );
 				}
 				if( stderrLogging != null )
 				{
@@ -247,17 +245,17 @@ public class VpncProcessHandler
 			}
 			catch( IOException e )
 			{
-				Log.e( TAG, e.getMessage(), e );
+				Util.error( e.getMessage(), e );
 			}
 			catch( InterruptedException e )
 			{
-				Log.e( TAG, e.getMessage(), e );
+				Util.error( e.getMessage(), e );
 			}
 			return true;
 		}
 		else
 		{
-			Log.d( TAG, "Will ignore disconnect call, no vpnc pid stored" );
+			Util.debug( "Will ignore disconnect call, no vpnc pid stored" );
 			return false;
 		}
 	}

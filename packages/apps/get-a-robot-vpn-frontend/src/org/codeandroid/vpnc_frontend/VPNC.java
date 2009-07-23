@@ -14,7 +14,6 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +28,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 public class VPNC extends PreferenceActivity implements OnPreferenceClickListener
 {
 
-	private final String TAG = "VPNC";
 	private ProgressCategory networkList;
 	private CheckBoxPreference vpnEnabled;
 
@@ -54,8 +52,8 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate( savedInstanceState );
-		passwordDialog = new Dialog(this);
-		connectedVpnId = getPreferences(MODE_PRIVATE).getInt( "connectedVpnId", -1 );
+		passwordDialog = new Dialog( this );
+		connectedVpnId = getPreferences( MODE_PRIVATE ).getInt( "connectedVpnId", -1 );
 		vpncHandler = new VpncProcessHandler();
 		if( vpncHandler.isConnected() == false && connectedVpnId != -1 )
 		{
@@ -65,7 +63,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		}
 		if( connectedVpnId != -1 && vpncHandler.isConnected() )
 		{
-			Log.d( TAG, "Last saved state indicates that we're connected to connection #" + connectedVpnId );
+			Util.debug( "Last saved state indicates that we're connected to connection #" + connectedVpnId );
 		}
 
 		addPreferencesFromResource( R.xml.vpnc_settings );
@@ -86,18 +84,17 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		getListView().setOnCreateContextMenuListener( createContextMenuListener );
 		ShowNetworks();
 	}
-	
+
 	@Override
 	protected void onPause()
 	{
 		saveConnectedVpnId();
 		super.onPause();
 	}
-	
-	
+
 	private void saveConnectedVpnId()
 	{
-		Editor editor = getPreferences(MODE_PRIVATE).edit();
+		Editor editor = getPreferences( MODE_PRIVATE ).edit();
 		editor.putInt( "connectedVpnId", connectedVpnId );
 		editor.commit();
 	}
@@ -105,7 +102,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	@Override
 	public void onConfigurationChanged(Configuration newConfig)
 	{
-		Log.d( TAG, "Configuration Changed. I'd rather handle it myself (and ignore it for now) than have the OS blow up all I've got in the middle of a connection!" );
+		Util.debug( "Configuration Changed. I'd rather handle it myself (and ignore it for now) than have the OS blow up all I've got in the middle of a connection!" );
 		super.onConfigurationChanged( newConfig );
 	}
 
@@ -121,18 +118,18 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 				switch( (int)adapterInfo.id )
 				{
 					case VPN_ENABLE:
-						Log.i( TAG, "long press handler skipping vpn checkbox" );
+						Util.info( "long press handler skipping vpn checkbox" );
 						break;
 					case VPN_NOTIFICATIONS:
-						Log.i( TAG, "long press handler skipping notifications checkbox" );
+						Util.info( "long press handler skipping notifications checkbox" );
 						break;
 
 					case ADD_NETWORK:
-						Log.i( TAG, "long press handler skipping add button" );
+						Util.info( "long press handler skipping add button" );
 						break;
 
 					default:
-						Log.i( TAG, "long press handler, handling the choice" );
+						Util.info( "long press handler, handling the choice" );
 						menu.add( Menu.NONE, 0, 0, R.string.connect );
 						menu.add( Menu.NONE, 1, 1, R.string.disconnect );
 						menu.add( Menu.NONE, 2, 2, R.string.edit );
@@ -153,9 +150,10 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 			{
 				case 0:
 					final NetworkConnectionInfo info = NetworkDatabase.getNetworkDatabase( this ).singleNetwork( networkPreference._id );
-					progressDialog = ProgressDialog.show( this, getString(R.string.please_wait), getString(R.string.connecting) );
+					progressDialog = ProgressDialog.show( this, getString( R.string.please_wait ), getString( R.string.connecting ) );
 					Thread thread = new Thread()
 					{
+
 						@Override
 						public void run()
 						{
@@ -167,15 +165,18 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 				case 1:
 					//if( connectedVpnId == networkPreference._id )
-					final ProgressDialog disconnectProgressDialog = ProgressDialog.show( this, getString(R.string.please_wait), getString(R.string.disconnecting) );
+					final ProgressDialog disconnectProgressDialog = ProgressDialog.show( this, getString( R.string.please_wait ),
+							getString( R.string.disconnecting ) );
 					Thread disconnectThread = new Thread()
 					{
+
 						@Override
 						public void run()
 						{
 							vpncHandler.disconnect();
 							Runnable uiTask = new Runnable()
 							{
+
 								public void run()
 								{
 									if( connectedVpnId != -1 )
@@ -210,14 +211,14 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		NetworkPreference networkPreferenceFound = null;
 		for( int index = 0; index < networkList.getPreferenceCount() && networkPreferenceFound == null; index++ )
 		{
-			NetworkPreference candidate = (NetworkPreference)networkList.getPreference(index);
+			NetworkPreference candidate = (NetworkPreference)networkList.getPreference( index );
 			if( candidate._id == info.getId() )
 			{
 				networkPreferenceFound = candidate;
 			}
 		}
 		final NetworkPreference networkPreference = networkPreferenceFound;
-		
+
 		//The network list shouldn't have changed so I'm banking on networkPreference not being null now
 		Runnable uiTask = new Runnable()
 		{
@@ -243,24 +244,26 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		};
 		handler.post( uiTask );
 	}
-	
+
 	public void getPassword()
 	{
-		passwordDialog.setContentView(R.layout.password_dialog);
-		passwordDialog.setTitle(R.string.please_type_password);
+		passwordDialog.setContentView( R.layout.password_dialog );
+		passwordDialog.setTitle( R.string.please_type_password );
 		Button okButton = (Button)passwordDialog.findViewById( R.id.okPasswordButton );
-		okButton.setOnClickListener(okPasswordOnClickListener);
+		okButton.setOnClickListener( okPasswordOnClickListener );
 		passwordDialog.show();
 	}
-	
+
 	private OnClickListener okPasswordOnClickListener = new OnClickListener()
 	{
+
 		public void onClick(View view)
 		{
-			final String password = ((EditText)view.getRootView().findViewById(R.id.passwordEditText)).getText().toString();
+			final String password = ( (EditText)view.getRootView().findViewById( R.id.passwordEditText ) ).getText().toString();
 			passwordDialog.dismiss();
 			Thread thread = new Thread()
 			{
+
 				@Override
 				public void run()
 				{
@@ -283,7 +286,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		for( NetworkConnectionInfo connectionInfo : connectionInfos )
 		{
 			NetworkPreference pref = new NetworkPreference( this, null, connectionInfo );
-			Log.i( TAG, "Adding NetworkPreference with ID:" + connectionInfo.getId() );
+			Util.info( "Adding NetworkPreference with ID:" + connectionInfo.getId() );
 			networkList.addPreference( pref );
 			if( pref._id == connectedVpnId )
 			{
@@ -299,23 +302,23 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 		if( key.equals( VPN_ENABLE_KEY ) )
 		{
-			Log.i( TAG, "on preference click handling vpn checkbox" );
+			Util.info( "on preference click handling vpn checkbox" );
 		}
 		else if( key.equals( VPN_NOTIFICATIONS_KEY ) )
 		{
-			Log.i( TAG, "on preference click handling notifications checkbox" );
+			Util.info( "on preference click handling notifications checkbox" );
 		}
 		else if( key.equals( ADD_NETWORK_KEY ) )
 		{
-			Log.i( TAG, "on preference click handling add button" );
+			Util.info( "on preference click handling add button" );
 			Intent intent = new Intent( this, EditNetwork.class );
 			intent.putExtra( Intent.EXTRA_TITLE, -1 );
 			startActivityForResult( intent, SUB_ACTIVITY_REQUEST_CODE );
-			Log.i( TAG, "ROAAAAAAAAAAAR!" );
+			Util.info( "ROAAAAAAAAAAAR!" );
 		}
 		else
 		{
-			Log.i( TAG, "dont care about the other preferences" );
+			Util.info( "dont care about the other preferences" );
 		}
 
 		// We should only handle a few cases here, not everything.
@@ -325,7 +328,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		super.onActivityResult( requestCode, resultCode, data );
-		Log.i( TAG, "On Activity Result: resultcode" + resultCode );
+		Util.info( "On Activity Result: resultcode" + resultCode );
 		ShowNetworks();
 	}
 
@@ -353,8 +356,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 			}
 		};
 	}
-	
-	
+
 	public Handler getHandler()
 	{
 		return handler;
