@@ -53,7 +53,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	{
 		super.onCreate( savedInstanceState );
 		passwordDialog = new Dialog( this );
-		connectedVpnId = getPreferences( MODE_PRIVATE ).getInt( "connectedVpnId", -1 );
+		connectedVpnId = getSharedPreferences( "vpnc", MODE_PRIVATE ).getInt( "connectedVpnId", -1 );
 		vpncHandler = new VpncProcessHandler();
 		if( vpncHandler.isConnected() == false && connectedVpnId != -1 )
 		{
@@ -94,7 +94,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 	private void saveConnectedVpnId()
 	{
-		Editor editor = getPreferences( MODE_PRIVATE ).edit();
+		Editor editor = getSharedPreferences( "vpnc", MODE_PRIVATE ).edit();
 		editor.putInt( "connectedVpnId", connectedVpnId );
 		editor.commit();
 	}
