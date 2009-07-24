@@ -56,7 +56,7 @@
 				<EditText android:id="@+android:id/IPSecSecretEditText"
 					android:layout_width="fill_parent" android:layout_height="wrap_content"
 					android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-					android:lines="1" android:autoText="true"
+					android:lines="1" android:autoText="true" android:password="true"
 					android:layout_weight="1" android:freezesText="true" />
 			</TableRow>
 			<TableRow android:id="@+id/TableRow08" android:layout_width="wrap_content"
@@ -78,7 +78,7 @@
 				<EditText android:id="@+android:id/passwordEditText"
 					android:layout_width="fill_parent" android:layout_height="wrap_content"
 					android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
-					android:lines="1" android:autoText="true"
+					android:lines="1" android:autoText="true" android:password="true"
 					android:layout_weight="1" android:freezesText="true" />
 			</TableRow>
 		</TableLayout>
