@@ -10,13 +10,12 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 // This class manages the creation of files on the disk in the /data/data/ directory.
 public class BackendFileManager extends Activity
 {
 
-	private final static String LOG_TAG = "VPNC_filemanager";
+	private final static String PREFIX = "filemanager: ";
 	private static String[] files = {"vpnc", "vpnc-script"};
 
 	private Handler handler = new Handler();
@@ -42,7 +41,7 @@ public class BackendFileManager extends Activity
 				}
 				catch( Throwable t )
 				{
-					Log.e( LOG_TAG, "Exception copying asset", t );
+					Util.error( PREFIX + "Exception copying asset", t );
 				}
 
 				try
@@ -64,17 +63,17 @@ public class BackendFileManager extends Activity
 						}
 						else
 						{
-							Log.e( LOG_TAG, "There is no tun either at /dev/net or /dev" );
+							Util.error( PREFIX + "There is no tun either at /dev/net or /dev" );
 						}
 					}
 					else
 					{
-						Log.d( LOG_TAG, "Found /dev/net/tun in place" );
+						Util.debug( PREFIX + "Found /dev/net/tun in place" );
 					}
 				}
 				catch( IOException e )
 				{
-					Log.e( LOG_TAG, "Exception attempting to symlink /dev/net/tun", e );
+					Util.error( PREFIX + "Exception attempting to symlink /dev/net/tun", e );
 				}
 
 				try
@@ -83,7 +82,7 @@ public class BackendFileManager extends Activity
 				}
 				catch( Throwable t )
 				{
-					Log.e( LOG_TAG, "Exception attempting to set files executable", t );
+					Util.error( PREFIX + "Exception attempting to set files executable", t );
 				}
 
 				Runnable uiTask = new Runnable()
@@ -108,11 +107,11 @@ public class BackendFileManager extends Activity
 
 		if( dstFile.exists() )
 		{
-			Log.i( LOG_TAG, "File: " + dstFile + "exists, not copying" );
+			Util.info( PREFIX + "File: " + dstFile + "exists, not copying" );
 			return;
 		}
 
-		Log.i( LOG_TAG, "Copying " + fileName + " to " + getFilesDir() + "/" + fileName );
+		Util.info( PREFIX + "Copying " + fileName + " to " + getFilesDir() + "/" + fileName );
 
 		InputStream in = this.getAssets().open( fileName );
 		OutputStream out = openFileOutput( fileName, MODE_PRIVATE );
@@ -136,7 +135,7 @@ public class BackendFileManager extends Activity
 
 		if( linkfil.exists() )
 		{
-			Log.i( LOG_TAG, "Symbolic link " + lnk + " exists, continuing..." );
+			Util.info( PREFIX + "Symbolic link " + lnk + " exists, continuing..." );
 			return;
 		}
 
@@ -151,14 +150,14 @@ public class BackendFileManager extends Activity
 		}
 		DataOutputStream out = new DataOutputStream( process.getOutputStream() );
 
-		Log.i( LOG_TAG, "ln -s " + res + " " + lnk + "\n" );
+		Util.info( PREFIX + "ln -s " + res + " " + lnk + "\n" );
 		out.writeBytes( "ln -s " + res + " " + lnk + "\n" );
 		out.writeBytes( "exit\n" );
 		out.flush();
 		out.close();
 		try
 		{
-			Log.i( LOG_TAG, "Done creating sym link " + lnk + " with return code " + process.waitFor() );
+			Util.info( PREFIX + "Done creating sym link " + lnk + " with return code " + process.waitFor() );
 		}
 		catch( InterruptedException e )
 		{
@@ -176,7 +175,7 @@ public class BackendFileManager extends Activity
 		out.close();
 		try
 		{
-			Log.i( LOG_TAG, "Done setting permission with return code " + process.waitFor() );
+			Util.info( PREFIX + "Done setting permission with return code " + process.waitFor() );
 		}
 		catch( InterruptedException e )
 		{
@@ -197,13 +196,13 @@ public class BackendFileManager extends Activity
 		}
 		DataOutputStream out = new DataOutputStream( process.getOutputStream() );
 		out.writeBytes( "mkdir " + dir + "\n" );
-		//			Log.d( LOG_TAG, readString( process.getErrorStream() ) );
+		//			Util.debug( PREFIX + readString( process.getErrorStream() ) );
 		out.writeBytes( "exit\n" );
 		out.flush();
 		out.close();
 		try
 		{
-			Log.i( LOG_TAG, "Done creating directory " + dir + " with return code " + process.waitFor() );
+			Util.info( PREFIX + "Done creating directory " + dir + " with return code " + process.waitFor() );
 		}
 		catch( InterruptedException e )
 		{
@@ -221,7 +220,7 @@ public class BackendFileManager extends Activity
 		out.close();
 		try
 		{
-			Log.i( LOG_TAG, "Loaded module " + module + " with return code " + process.waitFor() );
+			Util.info( PREFIX + "Loaded module " + module + " with return code " + process.waitFor() );
 		}
 		catch( InterruptedException e )
 		{

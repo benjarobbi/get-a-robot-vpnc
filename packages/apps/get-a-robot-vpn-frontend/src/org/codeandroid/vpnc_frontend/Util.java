@@ -10,7 +10,7 @@ import android.util.Log;
 
 public class Util
 {
-	public static final String LOG_TAG = "VPN_Connections";
+	private static final String LOG_TAG = "VPN_Connections";
 	public static final int DISCONNECT_NOTIFICATION = 1;
 	
 	public static int getProcessId()
@@ -127,5 +127,10 @@ public class Util
 	public static void error( String msg, Throwable throwable )
 	{
 		Log.e( LOG_TAG, msg, throwable );
+	}
+	
+	public static void printLog( int priority, String msg )
+	{
+		Log.println( priority, LOG_TAG, msg );
 	}
 }
