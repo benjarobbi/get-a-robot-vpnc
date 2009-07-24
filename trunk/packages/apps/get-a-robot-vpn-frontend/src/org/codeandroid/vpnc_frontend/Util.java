@@ -11,6 +11,7 @@ import android.util.Log;
 public class Util
 {
 	public static final String LOG_TAG = "VPN_Connections";
+	public static final int DISCONNECT_NOTIFICATION = 1;
 	
 	public static int getProcessId()
 	{
