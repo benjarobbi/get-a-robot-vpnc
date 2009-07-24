@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-import android.util.Log;
-
 public class LoggingThread extends Thread
 {
 
@@ -32,16 +30,16 @@ public class LoggingThread extends Thread
 		{
 			for( String line = bufferedReader.readLine(); line != null && !quit; line = bufferedReader.readLine() )
 			{
-				Log.println( priority, Util.LOG_TAG, prefix + ": " + line );
+				Util.printLog( priority, prefix + line );
 				if( logWriter != null )
 				{
-					logWriter.println( prefix + "\t" + line );
+					logWriter.println( prefix + line );
 				}
 			}
 		}
 		catch( IOException e )
 		{
-			Log.e( prefix, e.getMessage(), e );
+			Util.error( prefix + e.getMessage(), e );
 		}
 		finally
 		{

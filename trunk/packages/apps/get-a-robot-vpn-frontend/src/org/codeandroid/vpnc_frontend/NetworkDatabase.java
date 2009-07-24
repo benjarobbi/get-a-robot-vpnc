@@ -3,7 +3,6 @@ package org.codeandroid.vpnc_frontend;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -50,23 +49,23 @@ public class NetworkDatabase extends SQLiteOpenHelper
 	@Override
 	public void onCreate(SQLiteDatabase db)
 	{
-		Log.d( LOG_TAG, PREFIX + "onCreate - Start" );
+		Util.debug( PREFIX + "onCreate - Start" );
 		db.execSQL( "CREATE TABLE " + TABLE_NETWORKS + " (_id INTEGER PRIMARY KEY, " + FIELD_NETWORK_NICKNAME + " TEXT, " + FIELD_NETWORK_USERNAME
 				+ " TEXT, " + FIELD_NETWORK_PASSWORD + " TEXT, " + FIELD_NETWORK_GATEWAY + " TEXT, " + FIELD_NETWORK_ID + " TEXT, "
 				+ FIELD_NETWORK_SECRET + " TEXT, " + FIELD_NETWORK_LASTCONNECT + " INTEGER) " );
 
-		Log.d( LOG_TAG, PREFIX + "onCreate - End" );
+		Util.debug( PREFIX + "onCreate - End" );
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
 	{
 
-		Log.d( LOG_TAG, PREFIX + "onUpgrade - Start" );
-		Log.d( LOG_TAG, PREFIX + "registerLocationListener - Start" );
+		Util.debug( PREFIX + "onUpgrade - Start" );
+		Util.debug( PREFIX + "registerLocationListener - Start" );
 		db.execSQL( "DROP TABLE IF EXISTS " + TABLE_NETWORKS );
 		onCreate( db );
-		Log.d( LOG_TAG, PREFIX + "onUpgrade - End" );
+		Util.debug( PREFIX + "onUpgrade - End" );
 	}
 
 	/* Should only be called for new  networks */
@@ -117,7 +116,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 
 	public List<NetworkConnectionInfo> allNetworks()
 	{
-		Log.d( LOG_TAG, PREFIX + "allNetworks - Start" );
+		Util.debug( PREFIX + "allNetworks - Start" );
 		List<NetworkConnectionInfo> connectionInfos = new ArrayList<NetworkConnectionInfo>();
 		String sortField = FIELD_NETWORK_LASTCONNECT;
 
@@ -144,7 +143,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 
 	public NetworkConnectionInfo singleNetwork(int id)
 	{
-		Log.d( LOG_TAG, PREFIX + "singleNetwork - Start" );
+		Util.debug( PREFIX + "singleNetwork - Start" );
 		String where = KEY_ROWID + "=" + id;
 
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -166,7 +165,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 			{
 				IllegalStateException e = new IllegalStateException( "Expected 1 row to be returned but instead found number of rows to be: "
 						+ cursor.getCount() );
-				Log.e( LOG_TAG, e.getMessage(), e );
+				Util.error( e.getMessage(), e );
 				cursor.close();
 				throw e;
 			}
@@ -196,7 +195,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 	 */
 	public long deleteNetwork(long id)
 	{
-		Log.d( LOG_TAG, PREFIX + "Deleting network" );
+		Util.debug( PREFIX + "Deleting network" );
 		SQLiteDatabase db = this.getWritableDatabase();
 		try
 		{

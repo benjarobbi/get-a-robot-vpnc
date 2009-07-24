@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.util.AttributeSet;
-import android.util.Log;
 
 public class NetworkPreference extends Preference implements OnPreferenceClickListener
 {
@@ -17,7 +16,7 @@ public class NetworkPreference extends Preference implements OnPreferenceClickLi
 	public int _id = -1;
 
 	private Context mycontext;
-	private final String TAG = "VPNC - PREFERENCE WINDOW";
+	private final String PREFIX = "Preference Window: ";
 	private long lastConnect;
 	
 	public static DateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy hh:mm");
@@ -27,7 +26,7 @@ public class NetworkPreference extends Preference implements OnPreferenceClickLi
 		super( context, attrs );
 		mycontext = context;
 		setOnPreferenceClickListener( this );
-		Log.i( TAG, "Creating new NetworkPreference" );
+		Util.info( PREFIX + "Creating new NetworkPreference" );
 	}
 
 	public NetworkPreference(Context context, AttributeSet attrs, NetworkConnectionInfo connectionInfo)
