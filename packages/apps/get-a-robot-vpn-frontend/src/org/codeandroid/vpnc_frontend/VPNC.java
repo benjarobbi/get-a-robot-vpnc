@@ -4,11 +4,16 @@ import java.util.List;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -30,8 +35,12 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 	private ProgressCategory networkList;
 	private CheckBoxPreference vpnEnabled;
+	private boolean notificationEnabled;
 
 	private VpncProcessHandler vpncHandler;
+	private ServiceConnection serviceConnection = getServiceConnection();
+	private MonitorService monitorService;
+	private Intent monitorIntent = new Intent( MonitorServiceImpl.class.getName() );
 	private Handler handler = new Handler();
 	private ProgressDialog progressDialog;
 	private Dialog passwordDialog;
@@ -75,6 +84,10 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		vpnEnabled = (CheckBoxPreference)findPreference( "VPN" );
 		vpnEnabled.setOnPreferenceChangeListener( getVPNActivationListener() );
 
+		CheckBoxPreference notificationCheckBox = (CheckBoxPreference)findPreference( "NOTIFICATION" );
+		notificationCheckBox.setOnPreferenceChangeListener( getNotificationActivationListener() );
+		notificationEnabled = notificationCheckBox.isChecked();
+
 		networkList = (ProgressCategory)findPreference( "network_list" );
 		networkList.setOnPreferenceClickListener( this );
 
@@ -83,6 +96,9 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 		getListView().setOnCreateContextMenuListener( createContextMenuListener );
 		ShowNetworks();
+		
+		Util.debug( "Activity just started, let's see if we should create or bind to the monitor service" );
+		startMonitorService();
 	}
 
 	@Override
@@ -97,6 +113,16 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		Editor editor = getSharedPreferences( "vpnc", MODE_PRIVATE ).edit();
 		editor.putInt( "connectedVpnId", connectedVpnId );
 		editor.commit();
+		if( monitorService != null && connectedVpnId == -1 )
+		{
+			//Service is running, but shouldn't
+			stopMonitorService();
+		}
+		else if( monitorService == null )
+		{
+			//Service isn't running but maybe it should be
+			startMonitorService();
+		}
 	}
 
 	@Override
@@ -357,8 +383,81 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		};
 	}
 
+	private OnPreferenceChangeListener getNotificationActivationListener()
+	{
+		return new OnPreferenceChangeListener()
+		{
+			public boolean onPreferenceChange(Preference preference, Object newValue)
+			{
+				if( Boolean.TRUE.equals(newValue) )
+				{
+					Util.debug( "Notification option enabled" );
+					notificationEnabled = true;
+					startMonitorService();
+				}
+				else
+				{
+					Util.debug( "Notification option disabled" );
+					notificationEnabled = false;
+					stopMonitorService();
+				}
+				return true;
+			}
+		};
+	}
+
 	public Handler getHandler()
 	{
 		return handler;
+	}
+
+	private ServiceConnection getServiceConnection()
+	{
+		return new ServiceConnection()
+		{
+			public void onServiceConnected(ComponentName name, IBinder service)
+			{
+				Util.debug( "Connected to monitor service" );
+				monitorService = MonitorService.Stub.asInterface( service );
+			}
+			public void onServiceDisconnected(ComponentName name)
+			{
+				Util.debug( "oops, disconnected!" );
+				monitorService = null;
+			}
+		};
+	}
+
+	private void startMonitorService()
+	{
+		if( notificationEnabled && connectedVpnId != -1 )
+		{
+			Util.debug( "Monitoring is enabled and we should be connected to vpn connection #" + connectedVpnId );
+			Util.debug( "Will connect to service" );
+			
+			// Call start service first so the service lifecycle isn't tied to this activity
+			startService( monitorIntent );
+			bindService( monitorIntent, serviceConnection, Context.BIND_AUTO_CREATE );
+		}
+		else
+		{
+			Util.debug( "Monitoring will not start" );
+		}
+	}
+
+	private void stopMonitorService()
+	{
+		if( monitorService != null )
+		{
+			Util.debug( "Will disconnect service" );
+			try
+			{
+				monitorService.stopMonitor();
+			}
+			catch( RemoteException e )
+			{
+				Util.error( "Failed to stop monitoring service" );
+			}
+		}
 	}
 }
