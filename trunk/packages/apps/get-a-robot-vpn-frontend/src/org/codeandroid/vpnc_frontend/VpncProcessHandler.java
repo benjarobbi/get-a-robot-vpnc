@@ -20,7 +20,7 @@ public class VpncProcessHandler
 	
 	public VpncProcessHandler()
 	{
-		Util.debug( "VPNC_Service instantiated" );
+		Util.debug( "VpncProcessHandler instantiated" );
 		vpncProcessId = Util.getProcessId();
 	}
 
@@ -130,13 +130,13 @@ public class VpncProcessHandler
 				String stdinString = Util.readString( is, logWriter, false );
 				if( stdinString != null )
 				{
-					Log.d( "process stdout", stdinString );
+					Util.debug( "process stdout: " + stdinString );
 					logWriter.println( "process stdout" + "\t" + stdinString );
 				}
 				String stderrString = Util.readString( es, logWriter, false );
 				if( stderrString != null )
 				{
-					Log.d( "process stderr", stderrString );
+					Util.debug( "process stderr: " + stderrString );
 					logWriter.println( "process stderr" + "\t" + stderrString );
 				}
 				String concatenation = stdinString  + " - " + stderrString;
