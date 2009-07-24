@@ -54,6 +54,13 @@ public class MonitorServiceImpl extends Service
 		Util.debug( "onStart of service" );
 	}
 	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		Util.debug( "onDestroy of service" );
+	}
+	
 	public MonitorService getService()
 	{
 		return new MonitorService.Stub()
@@ -116,6 +123,7 @@ public class MonitorServiceImpl extends Service
 		public void run()
 		{
 			monitor();
+			Util.debug( "Monitor thread will stop running" );
 		}
 	}
 }
