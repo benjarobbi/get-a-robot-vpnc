@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -13,7 +12,6 @@ import android.widget.EditText;
 public class EditNetwork extends Activity
 {
 
-	private static final String LOG_TAG = "VPNC";
 	private static final String PREFIX = EditNetwork.class.getSimpleName() + ":";
 	private static final int NEW_CONNECTION = -1;
 	private static final int DIALOG_CONFIRM_DELETE = 10;
@@ -50,7 +48,7 @@ public class EditNetwork extends Activity
 			( (EditText)findViewById( R.id.xauthEditText ) ).setText( connectionInfo.getXauth() );
 			( (EditText)findViewById( R.id.passwordEditText ) ).setText( connectionInfo.getPassword() );
 		}
-		Log.d( LOG_TAG, PREFIX + "onCreate - End" );
+		Util.debug( PREFIX + "onCreate - End" );
 	}
 
 	@Override
