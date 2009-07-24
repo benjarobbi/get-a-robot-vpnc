@@ -13,13 +13,13 @@ public class LoggingThread extends Thread
 
 	private BufferedReader bufferedReader;
 	private PrintWriter logWriter;
-	private String tag;
+	private String prefix;
 	private boolean quit = false;
 	private int priority;
 
-	public LoggingThread(InputStream inputStream, PrintWriter logWriter, String tag, int priority)
+	public LoggingThread(InputStream inputStream, PrintWriter logWriter, String prefix, int priority)
 	{
-		this.tag = tag;
+		this.prefix = prefix;
 		this.logWriter = logWriter;
 		bufferedReader = new BufferedReader( new InputStreamReader( inputStream ) );
 		this.priority = priority;
@@ -32,16 +32,16 @@ public class LoggingThread extends Thread
 		{
 			for( String line = bufferedReader.readLine(); line != null && !quit; line = bufferedReader.readLine() )
 			{
-				Log.println( priority, tag, line );
+				Log.println( priority, Util.LOG_TAG, prefix + ": " + line );
 				if( logWriter != null )
 				{
-					logWriter.println( tag + "\t" + line );
+					logWriter.println( prefix + "\t" + line );
 				}
 			}
 		}
 		catch( IOException e )
 		{
-			Log.e( tag, e.getMessage(), e );
+			Log.e( prefix, e.getMessage(), e );
 		}
 		finally
 		{
