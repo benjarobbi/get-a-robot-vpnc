@@ -45,18 +45,10 @@
 # =========== script (variable) setup ====================================
 
 PATH=/sbin:/usr/sbin:$PATH
-RUNTIME_DATA="/data/data/org.codeandroid.vpnc_frontend/files"
-PREVIOUS_DNS_SETTINGS= "$RUNTIME_DATA/previous_dns_settings"
 
 OS="`uname -s`"
-RESOLV_CONF_BACKUP=$RUNTIME_DATA/resolv.conf-backup
 FULL_SCRIPTNAME=/system/bin/vpnc
 SCRIPTNAME=`basename $FULL_SCRIPTNAME`
-
-# some systems, eg. Darwin & FreeBSD, prune /var/run on boot
-if [ ! -d "$RUNTIME_DATA" ]; then
-	mkdir -p "$RUNTIME_DATA"
-fi
 
 # stupid SunOS: no blubber in /usr/local/bin ... (on stdout)
 IPROUTE="`which ip | grep '^/' 2> /dev/null`"
@@ -143,18 +135,17 @@ del_network_route() {
 # =========== resolv.conf handling for any OS =========================
 
 modify_resolvconf_android() {
+	echo "backing up dns and resolve.conf"
 	INTERNAL_IP4_DNS_TEMP="$INTERNAL_IP4_DNS"
 
 	PREVIOUS_DNS1=`getprop net.dns1`	
 	PREVIOUS_DNS2=`getprop net.dns2`	
-
-	# clean up
-	rm -rf "$PREVIOUS_DNS_SETTINGS"  
 	
-	PREVIOUS_DNS_SETTINGS= "$RUNTIME_DATA/previous_dns_settings"
+	echo $PREVIOUS_DNS1 > `dirname $0`/dns1.txt
+	echo $PREVIOUS_DNS2 > `dirname $0`/dns2.txt
 	
-	# save this to a file on data directory
-	echo "$PREVIOUS_DNS1\n$PREVOIUS_DNS2" >> "$PREVIOUS_DNS_SETTINGS"
+	RESOLV_CONF_BACKUP=`dirname $0`/resolv.conf-backup
+	cp /etc/resolv.conf $RESOLV_CONF_BACKUP
 
 	N=1
 
@@ -165,13 +156,18 @@ modify_resolvconf_android() {
 
 }
 
-restore_resolvconf_generic() {
-	if [ ! -e "$PREVIOUS_DNS_SETTINGS" ]; then
-		return
+restore_resolvconf_android() {
+	RESOLV_CONF_BACKUP=`dirname $0`/resolv.conf-backup
+	if [ -e "$RESOLV_CONF_BACKUP" ]; then
+		echo "restore script at work!"
+		grep '^#@VPNC_GENERATED@' /etc/resolv.conf > /dev/null 2>&1 && cat "$RESOLV_CONF_BACKUP" > /etc/resolv.conf
+		rm -f -- "$RESOLV_CONF_BACKUP"
+		SCRIPT_DIR=`dirname $0`
+		PREVIOUS_DNS1=`getprop net.dns1`	
+		PREVIOUS_DNS2=`getprop net.dns2`	
+		setprop net.dns1 `cat $SCRIPT_DIR/dns1.txt`
+		setprop net.dns2 `cat $SCRIPT_DIR/dns2.txt`
 	fi
-	grep '^#@VPNC_GENERATED@' /etc/resolv.conf > /dev/null 2>&1 && cat "$RESOLV_CONF_BACKUP" > /etc/resolv.conf
-	rm -f -- "$RESOLV_CONF_BACKUP"
-
 }
 
 # === resolv.conf handling via /sbin/resolvconf (Debian, Ubuntu, Gentoo)) =========
