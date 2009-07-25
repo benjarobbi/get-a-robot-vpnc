@@ -147,9 +147,9 @@ public class VpncProcessHandler
 					logWriter.println(msg);
 					vpnc.setConnected(true, info);
 					this.connectionInProgress = null;
-					stdoutLogging = new LoggingThread( is, logWriter, "process stdout", Log.DEBUG );
+					stdoutLogging = new LoggingThread( is, logWriter, "process stdout: ", Log.DEBUG );
 					stdoutLogging.start();
-					stderrLogging = new LoggingThread( process.getErrorStream(), logWriter, "process stderr", Log.VERBOSE );
+					stderrLogging = new LoggingThread( process.getErrorStream(), logWriter, "process stderr: ", Log.VERBOSE );
 					stderrLogging.start();
 					return;
 				}
