@@ -83,7 +83,7 @@ public class MonitorServiceImpl extends Service
 			{
 				if( Util.getProcessId() > 0 )
 				{
-					Util.debug( "Monitor service thinks we're still connected" );
+					Util.debug( "Monitor service: We're still connected" );
 					Thread.sleep( monitorInterval * 1000 );
 				}
 				else
@@ -107,10 +107,10 @@ public class MonitorServiceImpl extends Service
 	
 	private void notifyDisconnect()
 	{
-		Util.info( "Monitor service thinks we've lost VPN connection" );
+		Util.info( "Monitor service: We've lost connection" );
 		NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		Notification disconnectNotification = new Notification();
-		disconnectNotification.icon = R.drawable.icon;
+		disconnectNotification.icon = R.drawable.lost_connection;
 		disconnectNotification.flags = Notification.FLAG_AUTO_CANCEL;
 		disconnectNotification.vibrate = new long[]{100, 250, 100, 500}; 
 		PendingIntent pendingIntent = PendingIntent.getActivity( this, Util.DISCONNECT_NOTIFICATION, new Intent(this, VPNC.class), PendingIntent.FLAG_ONE_SHOT );
