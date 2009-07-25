@@ -13,7 +13,7 @@ public class MonitorServiceImpl extends Service
 {
 	private MonitorService service = getService();
 	private boolean monitoringEnabled = false;
-	private static final int monitorInterval = 10;
+	private static final int monitorInterval = 60;
 	
 
 	@Override
