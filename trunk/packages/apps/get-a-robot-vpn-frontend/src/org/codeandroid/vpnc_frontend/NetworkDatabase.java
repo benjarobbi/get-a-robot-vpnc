@@ -13,7 +13,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 {
 
 	public final static String DB_NAME = "networks";
-	public final static int DB_VERSION = 1;
+	public final static int DB_VERSION = 2;
 
 	public static final String KEY_ROWID = "_id";
 	public final static String TABLE_NETWORKS = "networks";
@@ -31,6 +31,8 @@ public class NetworkDatabase extends SQLiteOpenHelper
 	public static final String LOG_TAG = "VPNC";
 	private static final String PREFIX = NetworkDatabase.class.getSimpleName() + ":";
 	private static NetworkDatabase networkDatabase;
+	
+	private boolean assetUpgrade = false;
 
 	private NetworkDatabase(Context context)
 	{
@@ -62,9 +64,17 @@ public class NetworkDatabase extends SQLiteOpenHelper
 	{
 
 		Util.debug( PREFIX + "onUpgrade - Start" );
-		Util.debug( PREFIX + "registerLocationListener - Start" );
-		db.execSQL( "DROP TABLE IF EXISTS " + TABLE_NETWORKS );
-		onCreate( db );
+		if( oldVersion == 1 && newVersion == 2 )
+		{
+			//Not really a database upgrade. The assets have been updated.
+			assetUpgrade = true;
+		}
+		else
+		{
+			Util.debug( PREFIX + "registerLocationListener - Start" );
+			db.execSQL( "DROP TABLE IF EXISTS " + TABLE_NETWORKS );
+			onCreate( db );
+		}
 		Util.debug( PREFIX + "onUpgrade - End" );
 	}
 
@@ -206,5 +216,14 @@ public class NetworkDatabase extends SQLiteOpenHelper
 			db.close();
 		}
 	}
-
+	
+	public boolean isAssetUpgrade()
+	{
+		return assetUpgrade;
+	}
+	
+	public void setAssetUpgrade(boolean assetUpgrade)
+	{
+		this.assetUpgrade = assetUpgrade;
+	}
 }

@@ -24,6 +24,18 @@ public class BackendFileManager extends Activity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate( savedInstanceState );
+		
+		//Taking advantage of database upgrade hook to figure out if assets have changed
+		//Let Database upgrade and determine if files need to be deleted and replaced from assets
+		if( NetworkDatabase.getNetworkDatabase(this).isAssetUpgrade() )
+		{
+			Util.info( "Assets have been updated, old files should be removed" );
+			for( int i = 0; i < files.length; i++ )
+			{
+				getFileStreamPath( files[i] ).delete();
+			}
+			NetworkDatabase.getNetworkDatabase(this).setAssetUpgrade(false);
+		}
 
 		final ProgressDialog progressDialog = ProgressDialog.show( this, getString( R.string.please_wait ), getString( R.string.installing ) );
 		Thread thread = new Thread()
