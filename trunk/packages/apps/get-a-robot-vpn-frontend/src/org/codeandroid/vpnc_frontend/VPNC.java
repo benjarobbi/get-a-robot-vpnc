@@ -107,6 +107,20 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		saveConnectedVpnId();
 		super.onPause();
 	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		if( connectedVpnId != -1 && Util.getProcessId() <= 0 )
+		{
+			//Looks like we may have recently lost our connection
+			Util.debug( "Connection must have dropped" );
+			connectedVpnId = -1;
+			saveConnectedVpnId();
+			ShowNetworks();
+		}
+	}
 
 	private void saveConnectedVpnId()
 	{
