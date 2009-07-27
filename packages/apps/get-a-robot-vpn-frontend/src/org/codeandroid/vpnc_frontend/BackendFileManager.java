@@ -29,7 +29,7 @@ public class BackendFileManager extends Activity
 		//Let Database upgrade and determine if files need to be deleted and replaced from assets
 		if( NetworkDatabase.getNetworkDatabase(this).isAssetUpgrade() )
 		{
-			Util.info( "Assets have been updated, old files should be removed" );
+			Util.debug( "Assets have been updated, old files should be removed" );
 			for( int i = 0; i < files.length; i++ )
 			{
 				getFileStreamPath( files[i] ).delete();
@@ -119,11 +119,11 @@ public class BackendFileManager extends Activity
 
 		if( dstFile.exists() )
 		{
-			Util.info( PREFIX + "File: " + dstFile + "exists, not copying" );
+			Util.debug( PREFIX + "File: " + dstFile + "exists, not copying" );
 			return;
 		}
 
-		Util.info( PREFIX + "Copying " + fileName + " to " + getFilesDir() + "/" + fileName );
+		Util.debug( PREFIX + "Copying " + fileName + " to " + getFilesDir() + "/" + fileName );
 
 		InputStream in = this.getAssets().open( fileName );
 		OutputStream out = openFileOutput( fileName, MODE_PRIVATE );
@@ -147,7 +147,7 @@ public class BackendFileManager extends Activity
 
 		if( linkfil.exists() )
 		{
-			Util.info( PREFIX + "Symbolic link " + lnk + " exists, continuing..." );
+			Util.debug( PREFIX + "Symbolic link " + lnk + " exists, continuing..." );
 			return;
 		}
 
@@ -162,14 +162,14 @@ public class BackendFileManager extends Activity
 		}
 		DataOutputStream out = new DataOutputStream( process.getOutputStream() );
 
-		Util.info( PREFIX + "ln -s " + res + " " + lnk + "\n" );
+		Util.debug( PREFIX + "ln -s " + res + " " + lnk + "\n" );
 		out.writeBytes( "ln -s " + res + " " + lnk + "\n" );
 		out.writeBytes( "exit\n" );
 		out.flush();
 		out.close();
 		try
 		{
-			Util.info( PREFIX + "Done creating sym link " + lnk + " with return code " + process.waitFor() );
+			Util.debug( PREFIX + "Done creating sym link " + lnk + " with return code " + process.waitFor() );
 		}
 		catch( InterruptedException e )
 		{
@@ -187,7 +187,7 @@ public class BackendFileManager extends Activity
 		out.close();
 		try
 		{
-			Util.info( PREFIX + "Done setting permission with return code " + process.waitFor() );
+			Util.debug( PREFIX + "Done setting permission with return code " + process.waitFor() );
 		}
 		catch( InterruptedException e )
 		{
@@ -214,7 +214,7 @@ public class BackendFileManager extends Activity
 		out.close();
 		try
 		{
-			Util.info( PREFIX + "Done creating directory " + dir + " with return code " + process.waitFor() );
+			Util.debug( PREFIX + "Done creating directory " + dir + " with return code " + process.waitFor() );
 		}
 		catch( InterruptedException e )
 		{
@@ -232,7 +232,7 @@ public class BackendFileManager extends Activity
 		out.close();
 		try
 		{
-			Util.info( PREFIX + "Loaded module " + module + " with return code " + process.waitFor() );
+			Util.debug( PREFIX + "Loaded module " + module + " with return code " + process.waitFor() );
 		}
 		catch( InterruptedException e )
 		{
