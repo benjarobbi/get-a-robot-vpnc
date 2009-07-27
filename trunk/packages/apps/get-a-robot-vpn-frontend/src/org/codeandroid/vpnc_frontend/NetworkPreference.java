@@ -26,7 +26,7 @@ public class NetworkPreference extends Preference implements OnPreferenceClickLi
 		super( context, attrs );
 		mycontext = context;
 		setOnPreferenceClickListener( this );
-		Util.info( PREFIX + "Creating new NetworkPreference" );
+		Util.debug( PREFIX + "Creating new NetworkPreference" );
 	}
 
 	public NetworkPreference(Context context, AttributeSet attrs, NetworkConnectionInfo connectionInfo)
