@@ -4,5 +4,6 @@ package org.codeandroid.vpnc_frontend;
 
 interface MonitorService
 {
+    void startMonitor();
     void stopMonitor();
 }
