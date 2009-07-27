@@ -63,5 +63,7 @@
 	<string name="installing">Setting up VPN system requirements</string>
 	<string name="disconnecting">Disconnecting from VPN</string>
 	<string name="connection_dropped">VPN Connection Dropped</string>
-	<string name="connection_dropped_detail">VPN Connectivity has been interrupted</string>
+	<string name="connection_dropped_detail">VPN Connectivity interrupted</string>
+	<string name="reconnect_title">Reconnect</string>
+	<string name="reconnect_question">Reconnect to </string>
 </resources>

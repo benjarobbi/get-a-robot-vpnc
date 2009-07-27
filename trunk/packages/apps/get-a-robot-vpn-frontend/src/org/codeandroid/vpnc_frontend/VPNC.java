@@ -4,8 +4,10 @@ import java.util.List;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences.Editor;
@@ -64,15 +66,18 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		passwordDialog = new Dialog( this );
 		connectedVpnId = getSharedPreferences( "vpnc", MODE_PRIVATE ).getInt( "connectedVpnId", -1 );
 		vpncHandler = new VpncProcessHandler();
-		if( vpncHandler.isConnected() == false && connectedVpnId != -1 )
+		if( connectedVpnId != -1 )
 		{
-			//maybe the phone has been restarted or the vpnc process killed some other how
-			connectedVpnId = -1;
-			saveConnectedVpnId();
-		}
-		if( connectedVpnId != -1 && vpncHandler.isConnected() )
-		{
-			Util.debug( "Last saved state indicates that we're connected to connection #" + connectedVpnId );
+			if( vpncHandler.isConnected() )
+			{
+				Util.debug( "Last saved state indicates that we're connected to connection #" + connectedVpnId );
+			}
+			else
+			{
+				//maybe the phone has been restarted or the vpnc process killed some other how
+				connectedVpnId = -1;
+				saveConnectedVpnId();
+			}
 		}
 
 		addPreferencesFromResource( R.xml.vpnc_settings );
@@ -97,8 +102,11 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		getListView().setOnCreateContextMenuListener( createContextMenuListener );
 		ShowNetworks();
 		
-		Util.debug( "Activity just started, let's see if we should create or bind to the monitor service" );
-		startMonitorService();
+		String referrer = getIntent().getStringExtra( MonitorServiceImpl.class.getName() + ".referrer" );
+		if( MonitorServiceImpl.class.getName().equals(referrer) )
+		{
+			offerReconnect();
+		}
 	}
 
 	@Override
@@ -158,18 +166,18 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 				switch( (int)adapterInfo.id )
 				{
 					case VPN_ENABLE:
-						Util.info( "long press handler skipping vpn checkbox" );
+						Util.debug( "long press handler skipping vpn checkbox" );
 						break;
 					case VPN_NOTIFICATIONS:
-						Util.info( "long press handler skipping notifications checkbox" );
+						Util.debug( "long press handler skipping notifications checkbox" );
 						break;
 
 					case ADD_NETWORK:
-						Util.info( "long press handler skipping add button" );
+						Util.debug( "long press handler skipping add button" );
 						break;
 
 					default:
-						Util.info( "long press handler, handling the choice" );
+						Util.debug( "long press handler, handling the choice" );
 						menu.add( Menu.NONE, 0, 0, R.string.connect );
 						menu.add( Menu.NONE, 1, 1, R.string.disconnect );
 						menu.add( Menu.NONE, 2, 2, R.string.edit );
@@ -326,7 +334,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		for( NetworkConnectionInfo connectionInfo : connectionInfos )
 		{
 			NetworkPreference pref = new NetworkPreference( this, null, connectionInfo );
-			Util.info( "Adding NetworkPreference with ID:" + connectionInfo.getId() );
+			Util.debug( "Adding NetworkPreference with ID:" + connectionInfo.getId() );
 			networkList.addPreference( pref );
 			if( pref._id == connectedVpnId )
 			{
@@ -342,23 +350,23 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 		if( key.equals( VPN_ENABLE_KEY ) )
 		{
-			Util.info( "on preference click handling vpn checkbox" );
+			Util.debug( "on preference click handling vpn checkbox" );
 		}
 		else if( key.equals( VPN_NOTIFICATIONS_KEY ) )
 		{
-			Util.info( "on preference click handling notifications checkbox" );
+			Util.debug( "on preference click handling notifications checkbox" );
 		}
 		else if( key.equals( ADD_NETWORK_KEY ) )
 		{
-			Util.info( "on preference click handling add button" );
+			Util.debug( "on preference click handling add button" );
 			Intent intent = new Intent( this, EditNetwork.class );
 			intent.putExtra( Intent.EXTRA_TITLE, -1 );
 			startActivityForResult( intent, SUB_ACTIVITY_REQUEST_CODE );
-			Util.info( "ROAAAAAAAAAAAR!" );
+			Util.debug( "ROAAAAAAAAAAAR!" );
 		}
 		else
 		{
-			Util.info( "dont care about the other preferences" );
+			Util.debug( "dont care about the other preferences" );
 		}
 
 		// We should only handle a few cases here, not everything.
@@ -368,7 +376,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		super.onActivityResult( requestCode, resultCode, data );
-		Util.info( "On Activity Result: resultcode" + resultCode );
+		Util.debug( "On Activity Result: resultcode " + resultCode );
 		ShowNetworks();
 	}
 
@@ -419,6 +427,18 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 			}
 		};
 	}
+	
+	@Override
+	protected void onNewIntent(Intent intent)
+	{
+		Util.debug( "onNewIntenet" );
+		setIntent(intent);
+		String referrer = getIntent().getStringExtra( MonitorServiceImpl.class.getName() + ".referrer" );
+		if( MonitorServiceImpl.class.getName().equals(referrer) )
+		{
+			offerReconnect();
+		}
+	}
 
 	public Handler getHandler()
 	{
@@ -432,7 +452,15 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 			public void onServiceConnected(ComponentName name, IBinder service)
 			{
 				Util.debug( "Connected to monitor service" );
-				monitorService = MonitorService.Stub.asInterface( service );
+				monitorService = MonitorService.Stub.asInterface(service);
+				try
+				{
+					monitorService.startMonitor();
+				}
+				catch( RemoteException e )
+				{
+					Util.error( "Failed to start monitor service", e );
+				}
 			}
 			public void onServiceDisconnected(ComponentName name)
 			{
@@ -451,6 +479,10 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 			
 			// Call start service first so the service lifecycle isn't tied to this activity
 			startService( monitorIntent );
+			if( monitorService == null )
+			{
+				serviceConnection = getServiceConnection();
+			}
 			bindService( monitorIntent, serviceConnection, Context.BIND_AUTO_CREATE );
 		}
 		else
@@ -467,11 +499,41 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 			try
 			{
 				monitorService.stopMonitor();
+				monitorService = null;
 			}
 			catch( RemoteException e )
 			{
 				Util.error( "Failed to stop monitoring service" );
 			}
 		}
+	}
+	
+	private void offerReconnect()
+	{
+		int lastVpnId = getIntent().getExtras().getInt( MonitorServiceImpl.class.getName() + ".vpnId" );
+		final NetworkConnectionInfo info = NetworkDatabase.getNetworkDatabase(this).singleNetwork(lastVpnId);
+		Builder builder = new Builder(this);
+		builder.setTitle(R.string.reconnect_title);
+		builder.setCancelable(true).setNegativeButton( getString(R.string.cancel), null );
+		builder.setMessage( getString(R.string.reconnect_question) + " " + info.getNetworkName() + "?" );
+		android.content.DialogInterface.OnClickListener listener = new android.content.DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				progressDialog = ProgressDialog.show( VPNC.this, getString( R.string.please_wait ), getString( R.string.connecting ) );
+				Thread thread = new Thread()
+				{
+					@Override
+					public void run()
+					{
+						vpncHandler.connect( VPNC.this, info );
+					}
+				};
+				thread.start();
+			}
+		};
+		builder.setPositiveButton( R.string.ok, listener );
+		builder.create().show();
 	}
 }
