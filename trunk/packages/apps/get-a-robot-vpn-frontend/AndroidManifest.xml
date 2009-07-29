@@ -7,7 +7,7 @@
     	<meta-data	android:name="com.a0soft.gphone.aTrackDog.webURL"
 					android:value="http://code.google.com/p/get-a-robot-vpnc/" />
     	<meta-data	android:name="com.a0soft.gphone.aTrackDog.dlURL"
-					android:value="http://get-a-robot-vpnc.googlecode.com/files/VPN_Connections_v04.apk" />
+					android:value="http://code.google.com/p/get-a-robot-vpnc/downloads/list?can=3" />
 
 		<activity android:name=".EditNetwork" android:label="@string/add_network">
 		</activity>
