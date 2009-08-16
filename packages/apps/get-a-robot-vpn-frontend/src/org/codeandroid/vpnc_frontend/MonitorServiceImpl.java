@@ -11,11 +11,16 @@ import android.os.RemoteException;
 
 public class MonitorServiceImpl extends Service
 {
-	private MonitorService service = getService();
+	private MonitorService service;
 	private MonitorThread monitorThread;
 	private boolean monitoringEnabled = false;
 	private static final int monitorInterval = 60;
 	
+	public MonitorServiceImpl()
+	{
+		Util.debug( "MonitorServiceImpl.CTR()" );
+		service = getService();
+	}
 
 	@Override
 	public IBinder onBind(Intent intent)
@@ -36,6 +41,14 @@ public class MonitorServiceImpl extends Service
 	{
 		super.onCreate();
 		Util.debug( "MonitorServiceImpl.onCreate()" );
+		try
+		{
+			service.startMonitor();
+		}
+		catch( RemoteException e )
+		{
+			Util.error( "Failed to start monitor service", e );
+		}
 	}
 	
 	@Override
