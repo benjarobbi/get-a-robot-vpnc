@@ -53,10 +53,12 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 	private final int VPN_ENABLE = 1;
 	private final int VPN_NOTIFICATIONS = 2;
 	private final int ADD_NETWORK = 4;
+	private static final int DIALOG_FLAGS = 8;
 
 	private final String VPN_ENABLE_KEY = "VPN";
 	private final String VPN_NOTIFICATIONS_KEY = "NOTIFICATION";
 	private final String ADD_NETWORK_KEY = "ADD_NETWORK";
+	private final static String VPNC_FLAGS_KEY = "vpncFlags";
 
 	/** Called when the activity is first created. */
 	@Override
@@ -535,5 +537,76 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		};
 		builder.setPositiveButton( R.string.ok, listener );
 		builder.create().show();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		menu.add(Menu.NONE, 0, 0, R.string.vpnc_flags_option).setIcon(android.R.drawable.ic_menu_preferences);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		int id = item.getItemId();
+		if( id == 0 )
+		{
+			showDialog(DIALOG_FLAGS);
+		}
+		else
+		{
+			throw new IllegalStateException("Context Menu selection of " + id + " not expected.");
+		}
+		return false;
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(int dialogId)
+	{
+		if( dialogId == DIALOG_FLAGS )
+		{
+			Dialog dialog = new Dialog(this);
+			dialog.setContentView(R.layout.flags_dialog);
+			dialog.setTitle(R.string.vpnc_flags_prompt);
+			EditText flagsEditText = (EditText)dialog.findViewById(R.id.flagsEditText);
+			flagsEditText.setText( getExtraFlags() );
+			flagsEditText.selectAll();
+			
+			OnClickListener okListener = new OnClickListener()
+			{
+				public void onClick(View view)
+				{
+					EditText flagsEditText = (EditText)view.getRootView().findViewById(R.id.flagsEditText);
+					Editor preferenceEditor = getSharedPreferences("vpnc", MODE_PRIVATE).edit();
+					preferenceEditor.putString(VPNC_FLAGS_KEY, flagsEditText.getText().toString());
+					preferenceEditor.commit();
+					dismissDialog(DIALOG_FLAGS);
+				}
+			};
+			Button okButton = (Button)dialog.findViewById(R.id.flagsOkButton);
+			okButton.setOnClickListener(okListener);
+			
+			OnClickListener cancelListener = new OnClickListener()
+			{
+				public void onClick(View view)
+				{
+					dismissDialog(DIALOG_FLAGS);
+				}
+			};
+			Button cancelButton = (Button)dialog.findViewById(R.id.flagsCancelButton);
+			cancelButton.setOnClickListener(cancelListener);
+			
+			return dialog;
+		}
+		else
+		{
+			throw new IllegalStateException("Creation of dialog id #" + dialogId + " not expected.");
+		}
+	}
+	
+	String getExtraFlags()
+	{
+		return getSharedPreferences("vpnc", MODE_PRIVATE).getString(VPNC_FLAGS_KEY, "");
 	}
 }

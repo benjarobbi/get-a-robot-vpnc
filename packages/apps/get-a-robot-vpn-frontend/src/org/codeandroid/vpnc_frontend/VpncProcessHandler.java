@@ -59,7 +59,13 @@ public class VpncProcessHandler
 			{
 				Util.debug( Util.readString( is, logWriter, true ) );
 			}
-			Util.writeLine( os, logWriter, "/data/data/org.codeandroid.vpnc_frontend/files/vpnc --script /data/data/org.codeandroid.vpnc_frontend/files/vpnc-script --no-detach" );
+			String vpncCommand = "/data/data/org.codeandroid.vpnc_frontend/files/vpnc --script /data/data/org.codeandroid.vpnc_frontend/files/vpnc-script --no-detach";
+			String vpncFlags = vpnc.getExtraFlags();
+			if( vpncFlags.length() > 0 )
+			{
+				vpncCommand += (" " + vpncFlags);
+			}
+			Util.writeLine( os, logWriter, vpncCommand );
 
 			Util.debug( Util.readString( is, logWriter, true ) );
 			Util.debug( "IP " + gateway );
