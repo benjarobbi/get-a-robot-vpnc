@@ -138,11 +138,13 @@ modify_resolvconf_android() {
 	echo "backing up dns and resolve.conf"
 	INTERNAL_IP4_DNS_TEMP="$INTERNAL_IP4_DNS"
 
-	PREVIOUS_DNS1=`getprop net.dns1`	
-	PREVIOUS_DNS2=`getprop net.dns2`	
+	PREVIOUS_DNS1=`getprop net.dns1`
+	PREVIOUS_DNS2=`getprop net.dns2`
+	DEFAULT_ROUTE=`ip route | grep '^default'`
 	
 	echo $PREVIOUS_DNS1 > `dirname $0`/dns1.txt
 	echo $PREVIOUS_DNS2 > `dirname $0`/dns2.txt
+	echo $DEFAULT_ROUTE > `dirname $0`/def_route.txt
 	
 	RESOLV_CONF_BACKUP=`dirname $0`/resolv.conf-backup
 	cp /etc/resolv.conf $RESOLV_CONF_BACKUP
@@ -163,10 +165,9 @@ restore_resolvconf_android() {
 		grep '^#@VPNC_GENERATED@' /etc/resolv.conf > /dev/null 2>&1 && cat "$RESOLV_CONF_BACKUP" > /etc/resolv.conf
 		rm -f -- "$RESOLV_CONF_BACKUP"
 		SCRIPT_DIR=`dirname $0`
-		PREVIOUS_DNS1=`getprop net.dns1`	
-		PREVIOUS_DNS2=`getprop net.dns2`	
 		setprop net.dns1 `cat $SCRIPT_DIR/dns1.txt`
 		setprop net.dns2 `cat $SCRIPT_DIR/dns2.txt`
+		ip route replace `cat $SCRIPT_DIR/def_route.txt`
 	fi
 }
 
