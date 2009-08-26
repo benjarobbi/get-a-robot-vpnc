@@ -13,7 +13,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 {
 
 	public final static String DB_NAME = "networks";
-	public final static int DB_VERSION = 2;
+	public final static int DB_VERSION = 3;
 
 	public static final String KEY_ROWID = "_id";
 	public final static String TABLE_NETWORKS = "networks";
@@ -64,7 +64,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 	{
 
 		Util.debug( PREFIX + "onUpgrade - Start" );
-		if( oldVersion == 1 && newVersion == 2 )
+		if( oldVersion < 3  )
 		{
 			//Not really a database upgrade. The assets have been updated.
 			assetUpgrade = true;
