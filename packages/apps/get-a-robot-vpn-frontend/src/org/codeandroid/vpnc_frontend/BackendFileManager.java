@@ -179,7 +179,7 @@ public class BackendFileManager extends Activity
 
 	private void setFilesExecutable() throws IOException
 	{
-		Process process = Runtime.getRuntime().exec( "sh" );
+		Process process = Runtime.getRuntime().exec( "su -c sh" );
 		DataOutputStream out = new DataOutputStream( process.getOutputStream() );
 		out.writeBytes( "chmod 755 " + getFilesDir() + "/*\n" );
 		out.writeBytes( "exit\n" );
