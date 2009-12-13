@@ -81,6 +81,25 @@
 					android:lines="1" android:autoText="true" android:password="true"
 					android:layout_weight="1" android:freezesText="true" />
 			</TableRow>
+			<TableRow android:id="@+id/TableRow10" android:layout_width="wrap_content"
+				android:layout_height="wrap_content">
+				<TextView android:id="@+android:id/tokenAuthenticationTextView"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:text="@string/token_authentication" android:textSize="18sp" />
+				<CheckBox android:id="@+android:id/tokenAuthenticationCheckBox"
+					/>
+			</TableRow>
+			<TableRow android:id="@+id/TableRow11" android:layout_width="wrap_content"
+				android:layout_height="wrap_content">
+				<TextView android:id="@+android:id/timeoutTextView"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:text="@string/timeout" android:textSize="18sp" />
+				<EditText android:id="@+android:id/timeoutEditText"
+					android:layout_width="fill_parent" android:layout_height="wrap_content"
+					android:layout_marginLeft="3dip" android:layout_marginRight="3dip"
+					android:lines="1" android:numeric="decimal"
+					android:layout_weight="1" android:freezesText="true" />
+			</TableRow>
 		</TableLayout>
 
 		<LinearLayout android:id="@+android:id/addNetworkButtonLayout"

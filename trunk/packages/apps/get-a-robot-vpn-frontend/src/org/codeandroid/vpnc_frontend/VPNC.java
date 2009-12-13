@@ -295,9 +295,17 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 		handler.post( uiTask );
 	}
 
-	public void getPassword()
+	public void getPassword( boolean numericToken )
 	{
-		passwordDialog.setContentView( R.layout.password_dialog );
+		Util.debug( "Password is " + (numericToken?"numeric":"text") );
+		if( numericToken )
+		{
+			passwordDialog.setContentView( R.layout.numeric_password_dialog );
+		}
+		else
+		{
+			passwordDialog.setContentView( R.layout.text_password_dialog );
+		}
 		passwordDialog.setTitle( R.string.please_type_password );
 		Button okButton = (Button)passwordDialog.findViewById( R.id.okPasswordButton );
 		okButton.setOnClickListener( okPasswordOnClickListener );
@@ -309,7 +317,7 @@ public class VPNC extends PreferenceActivity implements OnPreferenceClickListene
 
 		public void onClick(View view)
 		{
-			final String password = ( (EditText)view.getRootView().findViewById( R.id.passwordEditText ) ).getText().toString();
+			final String password = ((EditText)passwordDialog.findViewById(R.id.passwordEditText)).getText().toString();
 			passwordDialog.dismiss();
 			Thread thread = new Thread()
 			{

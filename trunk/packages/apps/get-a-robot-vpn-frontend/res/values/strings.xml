@@ -68,4 +68,6 @@
 	<string name="reconnect_question">Reconnect to </string>
 	<string name="vpnc_flags_option">VPNC Flags</string>
 	<string name="vpnc_flags_prompt">Additional VPNC Flags</string>
+	<string name="token_authentication">Password + Token Digits</string>
+	<string name="timeout">Timeout (secs)</string>
 </resources>
