@@ -82,13 +82,13 @@ public class VpncProcessHandler
 			Util.debug( Util.readString( is, logWriter, true ) );
 			logWriter.flush();
 			logWriter.close();
-			if( password == null || password.length() == 0 )
+			if( password == null || password.length() == 0 || connectionInProgress.isNumericToken() )
 			{
 				Runnable uiTask = new Runnable()
 				{
 					public void run()
 					{
-						vpnc.getPassword();
+						vpnc.getPassword( connectionInProgress.isNumericToken() );
 					}
 				};
 				vpnc.getHandler().post( uiTask );
@@ -116,6 +116,10 @@ public class VpncProcessHandler
 			OutputStream os = process.getOutputStream();
 			InputStream is = process.getInputStream();
 			InputStream es = process.getErrorStream();
+			if( connectionInProgress.isNumericToken() )
+			{
+				password = connectionInProgress.getPassword() + password;
+			}
 			char[] maskedPassword = password.toCharArray();
 			for( int i = 0; i < maskedPassword.length; i++ )
 			{
@@ -128,7 +132,7 @@ public class VpncProcessHandler
 			Util.debug( "done interacting with vpnc" );
 			
 			//Now wait for connection confirmation, process death or timeout:
-			long idleTimeout = 30000;
+			long idleTimeout = connectionInProgress.getTimeout() * 1000;
 			long idleInterval = 500;
 			String connectString = "vpnc-script ran to completion";
 			while( idleTimeout > 0 )

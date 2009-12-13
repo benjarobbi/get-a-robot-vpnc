@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 public class EditNetwork extends Activity
@@ -47,6 +48,17 @@ public class EditNetwork extends Activity
 			( (EditText)findViewById( R.id.IPSecSecretEditText ) ).setText( connectionInfo.getIpSecSecret() );
 			( (EditText)findViewById( R.id.xauthEditText ) ).setText( connectionInfo.getXauth() );
 			( (EditText)findViewById( R.id.passwordEditText ) ).setText( connectionInfo.getPassword() );
+			boolean numericToken = connectionInfo.isNumericToken();
+			if( numericToken )
+			{
+				( (CheckBox)findViewById(R.id.tokenAuthenticationCheckBox) ).setChecked(true);
+			}
+			int timeout = connectionInfo.getTimeout();
+			if( timeout == 0 )
+			{
+				timeout = 30;
+			}
+			( (EditText)findViewById(R.id.timeoutEditText) ).setText( String.valueOf(timeout) );
 		}
 		Util.debug( PREFIX + "onCreate - End" );
 	}
@@ -70,14 +82,26 @@ public class EditNetwork extends Activity
 			connectionInfo.setIpSecSecret( ( (EditText)findViewById( R.id.IPSecSecretEditText ) ).getText().toString() );
 			connectionInfo.setXauth( ( (EditText)findViewById( R.id.xauthEditText ) ).getText().toString() );
 			connectionInfo.setPassword( ( (EditText)findViewById( R.id.passwordEditText ) ).getText().toString() );
+			connectionInfo.setNumericToken( ( (CheckBox)findViewById( R.id.tokenAuthenticationCheckBox ) ).isChecked() );
+			CharSequence timeoutString = ( (EditText)findViewById(R.id.timeoutEditText) ).getText();
+			if( timeoutString.length() > 0 )
+			{
+				connectionInfo.setTimeout( Integer.valueOf(timeoutString.toString()) );
+			}
+			else
+			{
+				connectionInfo.setTimeout(30);
+			}
 			if( id == NEW_CONNECTION )
 			{
-				NetworkDatabase.getNetworkDatabase( EditNetwork.this ).createNetwork( connectionInfo );
+				long count = NetworkDatabase.getNetworkDatabase( EditNetwork.this ).createNetwork( connectionInfo );
+				Util.debug( "Inserted " + count + " records into the database" );
 			}
 			else
 			{
 				connectionInfo.setId( id );
-				NetworkDatabase.getNetworkDatabase( EditNetwork.this ).updateNetwork( connectionInfo );
+				long count = NetworkDatabase.getNetworkDatabase( EditNetwork.this ).updateNetwork( connectionInfo );
+				Util.debug( "Updated database and modified " + count + " record" );
 			}
 			finish();
 		}

@@ -10,6 +10,8 @@ public class NetworkConnectionInfo
 	private String ipSecSecret;
 	private String xauth;
 	private String password;
+	private boolean numericToken;
+	private int timeout;
 	private long lastConnect;
 
 	public int getId()
@@ -92,4 +94,23 @@ public class NetworkConnectionInfo
 		this.lastConnect = lastConnect;
 	}
 
+	public boolean isNumericToken()
+	{
+		return numericToken;
+	}
+
+	public void setNumericToken(boolean numericToken)
+	{
+		this.numericToken = numericToken;
+	}
+
+	public int getTimeout()
+	{
+		return timeout;
+	}
+	
+	public void setTimeout(int timeout)
+	{
+		this.timeout = timeout;
+	}
 }

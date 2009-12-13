@@ -13,7 +13,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 {
 
 	public final static String DB_NAME = "networks";
-	public final static int DB_VERSION = 3;
+	public final static int DB_VERSION = 4;
 
 	public static final String KEY_ROWID = "_id";
 	public final static String TABLE_NETWORKS = "networks";
@@ -23,6 +23,8 @@ public class NetworkDatabase extends SQLiteOpenHelper
 	public final static String FIELD_NETWORK_USERNAME = "Xauth";
 	public final static String FIELD_NETWORK_PASSWORD = "password";
 	public final static String FIELD_NETWORK_LASTCONNECT = "lastconnect";
+	public final static String FIELD_NETWORK_TOKEN = "token_auth";
+	public final static String FIELD_NETWORK_TIMEOUT = "timeout";
 
 	public final static String FIELD_NETWORK_NICKNAME = "nickname";
 	public final static String FIELD_KEY_NAME = "nickname";
@@ -54,7 +56,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 		Util.debug( PREFIX + "onCreate - Start" );
 		db.execSQL( "CREATE TABLE " + TABLE_NETWORKS + " (_id INTEGER PRIMARY KEY, " + FIELD_NETWORK_NICKNAME + " TEXT, " + FIELD_NETWORK_USERNAME
 				+ " TEXT, " + FIELD_NETWORK_PASSWORD + " TEXT, " + FIELD_NETWORK_GATEWAY + " TEXT, " + FIELD_NETWORK_ID + " TEXT, "
-				+ FIELD_NETWORK_SECRET + " TEXT, " + FIELD_NETWORK_LASTCONNECT + " INTEGER) " );
+				+ FIELD_NETWORK_SECRET + " TEXT, " + FIELD_NETWORK_LASTCONNECT + " INTEGER, " + FIELD_NETWORK_TOKEN + " BOOLEAN, " + FIELD_NETWORK_TIMEOUT + " INTEGER);" );
 
 		Util.debug( PREFIX + "onCreate - End" );
 	}
@@ -71,9 +73,9 @@ public class NetworkDatabase extends SQLiteOpenHelper
 		}
 		else
 		{
-			Util.debug( PREFIX + "registerLocationListener - Start" );
-			db.execSQL( "DROP TABLE IF EXISTS " + TABLE_NETWORKS );
-			onCreate( db );
+			Util.debug( PREFIX + "onUpgrade - database upgrade" );
+			db.execSQL( "ALTER TABLE " + TABLE_NETWORKS + " ADD " + FIELD_NETWORK_TOKEN + " BOOLEAN" );
+			db.execSQL( "ALTER TABLE " + TABLE_NETWORKS + " ADD " + FIELD_NETWORK_TIMEOUT + " INTEGER" );
 		}
 		Util.debug( PREFIX + "onUpgrade - End" );
 	}
@@ -93,6 +95,8 @@ public class NetworkDatabase extends SQLiteOpenHelper
 			values.put( FIELD_NETWORK_USERNAME, connectionInfo.getXauth() );
 			values.put( FIELD_NETWORK_PASSWORD, connectionInfo.getPassword() );
 			values.put( FIELD_NETWORK_LASTCONNECT, Long.MAX_VALUE );
+			values.put( FIELD_NETWORK_TOKEN, connectionInfo.isNumericToken() );
+			values.put( FIELD_NETWORK_TIMEOUT, connectionInfo.getTimeout() );
 			return db.insert( TABLE_NETWORKS, null, values );
 		}
 		finally
@@ -116,6 +120,8 @@ public class NetworkDatabase extends SQLiteOpenHelper
 			values.put( FIELD_NETWORK_USERNAME, connectionInfo.getXauth() );
 			values.put( FIELD_NETWORK_PASSWORD, connectionInfo.getPassword() );
 			values.put( FIELD_NETWORK_LASTCONNECT, connectionInfo.getLastConnect() );
+			values.put( FIELD_NETWORK_TOKEN, connectionInfo.isNumericToken() );
+			values.put( FIELD_NETWORK_TIMEOUT, connectionInfo.getTimeout() );
 			return db.update( TABLE_NETWORKS, values, KEY_ROWID + "=" + connectionInfo.getId(), null );
 		}
 		finally
@@ -136,7 +142,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 			Cursor cursor = db
 					.query(
 							TABLE_NETWORKS,
-							new String[] {KEY_ROWID, FIELD_NETWORK_NICKNAME, FIELD_NETWORK_USERNAME, FIELD_NETWORK_PASSWORD, FIELD_NETWORK_GATEWAY, FIELD_NETWORK_ID, FIELD_NETWORK_SECRET, FIELD_NETWORK_LASTCONNECT},
+							new String[] {KEY_ROWID, FIELD_NETWORK_NICKNAME, FIELD_NETWORK_USERNAME, FIELD_NETWORK_PASSWORD, FIELD_NETWORK_GATEWAY, FIELD_NETWORK_ID, FIELD_NETWORK_SECRET, FIELD_NETWORK_LASTCONNECT, FIELD_NETWORK_TOKEN, FIELD_NETWORK_TIMEOUT},
 							null, null, null, null, sortField + " DESC" );
 			while( cursor.moveToNext() )
 			{
@@ -162,7 +168,7 @@ public class NetworkDatabase extends SQLiteOpenHelper
 			Cursor cursor = db
 					.query(
 							TABLE_NETWORKS,
-							new String[] {KEY_ROWID, FIELD_NETWORK_NICKNAME, FIELD_NETWORK_USERNAME, FIELD_NETWORK_PASSWORD, FIELD_NETWORK_GATEWAY, FIELD_NETWORK_ID, FIELD_NETWORK_SECRET, FIELD_NETWORK_LASTCONNECT},
+							new String[] {KEY_ROWID, FIELD_NETWORK_NICKNAME, FIELD_NETWORK_USERNAME, FIELD_NETWORK_PASSWORD, FIELD_NETWORK_GATEWAY, FIELD_NETWORK_ID, FIELD_NETWORK_SECRET, FIELD_NETWORK_LASTCONNECT, FIELD_NETWORK_TOKEN, FIELD_NETWORK_TIMEOUT},
 							where, null, null, null, null );
 			if( cursor.getCount() == 1 )
 			{
@@ -197,6 +203,8 @@ public class NetworkDatabase extends SQLiteOpenHelper
 		info.setIpSecId( cursor.getString(5) );
 		info.setIpSecSecret( cursor.getString(6) );
 		info.setLastConnect( cursor.getLong(7) );
+		info.setNumericToken( cursor.getInt(8) > 0 );
+		info.setTimeout( cursor.getInt(9) );
 		return info;
 	}
 
