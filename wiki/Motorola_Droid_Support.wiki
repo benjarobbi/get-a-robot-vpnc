@@ -1,0 +1,21 @@
+#labels Featured
+1. Your Droid must be rooted, if it isn't follow these directions.
+   http://forum.xda-developers.com/showthread.php?t=597175
+
+2. You need to have busybox installed so that you can copy tun.ko to the correct location. If you don't, try this:
+   http://alldroid.org/viewtopic.php?f=210&t=792&sid=0434b8057ca181ae1bdaa1e0c0c42b2e
+
+   or install it manually:
+   http://alldroid.org/viewtopic.php?f=210&t=603&sid=0434b8057ca181ae1bdaa1e0c0c42b2e
+
+3. Copy tun.ko from your SD card to /system/lib/modules/
+   - Copy tun.ko to your SD card
+   - Using either adb or a terminal emulator run:
+       # su
+       # mount -o remount,rw /system
+       # cp /sdcard/tun.ko /system/lib/modules/
+       # mount -o remount,ro /system
+
+4. Install VPN_Connections_v096.apk or newer.
+
+-- The "tun.ko" module and instructions were contributed by Jon Tomaszewski
