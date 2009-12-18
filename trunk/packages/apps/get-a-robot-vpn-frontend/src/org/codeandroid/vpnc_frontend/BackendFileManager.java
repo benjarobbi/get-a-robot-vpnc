@@ -62,8 +62,13 @@ public class BackendFileManager extends Activity
 					{
 						if( !new File("/dev/tun").exists() )
 						{
-							//Try a modprobe, what's the downside?
-							loadModule( "tun" );
+							//Try a modprobe
+							loadModule( "modprobe", "tun" );
+						}
+						if( !new File("/dev/tun").exists() )
+						{
+							//Try an insmod now, especially for the rooted Droid
+							loadModule( "insmod", "/system/lib/modules/tun.ko" );
 						}
 						if( new File( "/dev/tun" ).exists() )
 						{
@@ -222,11 +227,11 @@ public class BackendFileManager extends Activity
 		}
 	}
 
-	private void loadModule(String module) throws IOException
+	private void loadModule(String command, String module) throws IOException
 	{
 		Process process = Runtime.getRuntime().exec( "su -c sh" );
 		DataOutputStream out = new DataOutputStream( process.getOutputStream() );
-		out.writeBytes( "modprobe " + module + "\n" );
+		out.writeBytes( command + " " + module + "\n" );
 		out.writeBytes( "exit\n" );
 		out.flush();
 		out.close();
