@@ -19,3 +19,5 @@
 4. Install VPN_Connections_v096.apk or newer.
 
 -- The "tun.ko" module and instructions were contributed by Jon Tomaszewski
+
+*** Make sure to read the comments below. You need the right version of busybox and have it install the symlinks.
