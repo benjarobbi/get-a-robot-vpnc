@@ -70,6 +70,8 @@ setprop net.dns1 8.8.8.8 and # setprop net.dns2 8.8.4.4 to set your
 dns servers to the ones operated by Google.
 
 -- The "tun.ko" module and initial instructions were contributed by Jon Tomaszewski
+
 -- These updated and detailed instructions here were contributed by Mike DeAngelo
+
 
 *** If you still have trouble, make sure to read the comments below.
