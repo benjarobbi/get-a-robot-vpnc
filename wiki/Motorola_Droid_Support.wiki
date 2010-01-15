@@ -72,4 +72,4 @@ dns servers to the ones operated by Google.
 -- The "tun.ko" module and initial instructions were contributed by Jon Tomaszewski
 -- These updated and detailed instructions here were contributed by Mike DeAngelo
 
-*** If you still have trouble, make sure to read the comments below. A working version of busybox has been uploaded to this project site for your convenience.
+*** If you still have trouble, make sure to read the comments below.
