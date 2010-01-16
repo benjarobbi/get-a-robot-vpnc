@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 
@@ -133,10 +134,32 @@ public class MonitorServiceImpl extends Service
 	{
 		Util.info( "Monitor service: We've lost connection" );
 		NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-		Notification disconnectNotification = new Notification();
-		disconnectNotification.icon = R.drawable.lost_connection;
+		Notification disconnectNotification = new Notification( R.drawable.lost_connection, null, System.currentTimeMillis() );
 		disconnectNotification.flags = Notification.FLAG_AUTO_CANCEL;
-		disconnectNotification.vibrate = new long[]{100, 250, 100, 500};
+		
+		AudioManager audioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
+		int ringerMode = audioManager.getRingerMode();
+		switch( ringerMode )
+		{
+			case AudioManager.RINGER_MODE_VIBRATE:
+				disconnectNotification.vibrate = new long[]{100, 250, 100, 500};
+				break;
+				
+			case AudioManager.RINGER_MODE_NORMAL:
+				disconnectNotification.defaults = Notification.DEFAULT_SOUND;
+				break;
+				
+			case AudioManager.RINGER_MODE_SILENT:
+				disconnectNotification.ledARGB = 0xff0000ff;
+				disconnectNotification.ledOnMS = 500;
+				disconnectNotification.ledOffMS = 3000;
+				disconnectNotification.flags |= Notification.FLAG_SHOW_LIGHTS;
+				break;
+
+			default:
+				break;
+		}
+
 		Intent vpncIntent = new Intent(this, VPNC.class);
 		vpncIntent.putExtra( this.getClass().getName() + ".referrer", this.getClass().getName() );
 		vpncIntent.putExtra( this.getClass().getName() + ".vpnId", getVpnId() );
