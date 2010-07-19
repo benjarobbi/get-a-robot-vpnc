@@ -1,0 +1,5 @@
+Running the VPN client on your HTC Incredible
+
+= Introduction =
+
+General requirements remain the same for this device as any other device: Root access and a proper tun device.
