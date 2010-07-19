@@ -1,3 +1,4 @@
+#labels Featured
 Running the VPN client on your HTC Incredible
 
 = Introduction =
